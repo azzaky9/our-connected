@@ -47,19 +47,17 @@ const dummy = [
 
 const page = () => {
   return (
-    <div className=''>
-      <div className='grid place-content-center'>
-        {dummy.map((post, index) => (
-          <PostCard
-            content={post.contentPost}
-            title={post.titlePost}
-            uploadedName={post.name}
-            datePost={post.datePost}
-            key={index}
-          />
-        ))}
-      </div>
-    </div>
+    <>
+      {dummy.map((post, index) => (
+        <PostCard
+          content={post.contentPost}
+          title={post.titlePost}
+          uploadedName={post.name}
+          datePost={post.datePost}
+          key={index}
+        />
+      ))}
+    </>
   );
 };
 

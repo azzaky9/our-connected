@@ -5,11 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { MdOutlineMail } from "react-icons/md";
 import { useForm, Resolver } from "react-hook-form";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/config";
-import { useRouter } from "next/navigation";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import useFirebaseAuth from "@/hooks/useFirebaseAuth";
+import { useCallback } from "react";
 
-type FormInput = {
+export type FormInput = {
   email: string;
   password: string;
 };
@@ -33,8 +33,12 @@ const resolver: Resolver<FormInput> = async (values) => {
   };
 };
 
-const Form = () => {
-  const router = useRouter();
+interface TFormProps {
+  model: "Sign In" | "Sign Up";
+}
+
+const Form: React.FC<TFormProps> = ({ model }) => {
+  const { mutationLogin, mutationRegister } = useFirebaseAuth();
 
   const {
     register,
@@ -42,15 +46,19 @@ const Form = () => {
     formState: { errors }
   } = useForm<FormInput>({ resolver });
 
-  const onSubmits = handleSubmit(({ email, password }) => {
-    console.log(email);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
-        router.replace("/feeds");
-      })
-      .catch((err) => console.error(err));
+  const onSubmits = handleSubmit((inputValue) => {
+    return model === "Sign In"
+      ? mutationLogin.mutate({ email: inputValue.email, password: inputValue.password })
+      : mutationRegister.mutate({ email: inputValue.email, password: inputValue.password });
   });
+
+  const generateLoadingBooleans = useCallback(() => {
+    if (mutationLogin.isLoading || mutationRegister.isLoading) {
+      return true;
+    }
+
+    return false;
+  }, [mutationLogin.isLoading, mutationRegister.isLoading]);
 
   return (
     <form onSubmit={onSubmits}>
@@ -82,10 +90,20 @@ const Form = () => {
           </span>
         </div>
         <Button
+          type='submit'
           variant='default'
           className='w-full flex gap-2 justify-center mt-5'>
-          <MdOutlineMail fontSize='1.182rem' />
-          Sign in
+          {generateLoadingBooleans() ? (
+            <>
+              <span>Please Wait</span>
+              <AiOutlineLoading3Quarters className='animate-spin' />
+            </>
+          ) : (
+            <>
+              <MdOutlineMail fontSize='1.182rem' />
+              <span>{model === "Sign In" ? "Sign in" : "Sign up"}</span>
+            </>
+          )}
         </Button>
       </div>
     </form>

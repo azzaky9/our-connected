@@ -13,17 +13,22 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger
 } from "@/components/ui/navigation-menu";
+import useCustomToast from "@/hooks/useCustomToast";
 
 const Navbar = () => {
   const currentPath = usePathname();
+  const { generateToast } = useCustomToast();
 
-  if (currentPath === "/signin") {
+  if (currentPath === "/register/signin" || currentPath === "/register/signup") {
     return null;
   }
 
   return (
     <nav className='sticky top-0 text-white bg-gray-400 border-b border-gray-800 bg-opacity-[0.02] filter backdrop-blur-sm px-4 py-6'>
       <div className='flex gap-5 justify-center items-center'>
+        <button onClick={() => generateToast({ variant: "info", message: "test" })}>
+          test button
+        </button>
         <Popover>
           <PopoverTrigger
             className='hover:cursor-pointer'

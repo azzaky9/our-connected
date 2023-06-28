@@ -19,7 +19,7 @@ interface TPostCard {
 
 const PostCard: React.FC<TPostCard> = ({ uploadedName, datePost, title, content }) => {
   return (
-    <Card className='max-w-[720px] w-full my-5 hover:bg-gray-900 hover:scale-105  transition duration-300'>
+    <Card className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 hover:scale-105  transition duration-300'>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>

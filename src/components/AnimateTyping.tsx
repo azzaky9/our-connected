@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { TypeAnimation } from "react-type-animation";
 
 const AnimateTyping = () => {
@@ -18,4 +19,6 @@ const AnimateTyping = () => {
   );
 };
 
-export default AnimateTyping;
+const AnimateType = memo(AnimateTyping);
+
+export default AnimateType;

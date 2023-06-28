@@ -1,6 +1,8 @@
 import "./globals.css";
-import { Inter, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import Navbar from "@/components/Navbar";
+import Providers from "@/app/utils/Providers";
+import { Toaster } from "@/components/ui/toastutils/toaster";
 
 const inter = Poppins({ weight: ["400", "600", "800"], subsets: ["latin"] });
 
@@ -13,8 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <body className={`${inter.className} bg-gradient-to-br  from-zinc-900 to-slate-950`}>
-        <Navbar />
-        {children}
+        <Providers>
+          <Navbar />
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
