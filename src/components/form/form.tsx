@@ -7,7 +7,8 @@ import { MdOutlineMail } from "react-icons/md";
 import { useForm, Resolver } from "react-hook-form";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import useFirebaseAuth from "@/hooks/useFirebaseAuth";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import { BsEyeSlashFill, BsEyeFill } from "react-icons/bs";
 
 export type FormInput = {
   email: string;
@@ -38,18 +39,25 @@ interface TFormProps {
 }
 
 const Form: React.FC<TFormProps> = ({ model }) => {
-  const { mutationLogin, mutationRegister } = useFirebaseAuth();
+  const { mutationLogin, mutationRegister, errMessage, isAuthError } = useFirebaseAuth();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    resetField
   } = useForm<FormInput>({ resolver });
 
   const onSubmits = handleSubmit((inputValue) => {
-    return model === "Sign In"
-      ? mutationLogin.mutate({ email: inputValue.email, password: inputValue.password })
-      : mutationRegister.mutate({ email: inputValue.email, password: inputValue.password });
+    if (model === "Sign In") {
+      mutationLogin.mutate({ email: inputValue.email, password: inputValue.password });
+    } else {
+      mutationRegister.mutate({ email: inputValue.email, password: inputValue.password });
+    }
+
+    resetField("password");
   });
 
   const generateLoadingBooleans = useCallback(() => {
@@ -59,6 +67,11 @@ const Form: React.FC<TFormProps> = ({ model }) => {
 
     return false;
   }, [mutationLogin.isLoading, mutationRegister.isLoading]);
+
+  const togglePassword = () => setShowPassword(!showPassword);
+
+  // const getMessageFailedAuth = failedAuth()
+  const loadBool = generateLoadingBooleans();
 
   return (
     <form onSubmit={onSubmits}>
@@ -75,25 +88,38 @@ const Form: React.FC<TFormProps> = ({ model }) => {
           <span className='text-red-700 text-sm'>{errors.email ? errors.email.message : null}</span>
         </div>
         <div className='flex flex-col space-y-1.5'>
-          <Label htmlFor='email'>Password</Label>
+          <Label htmlFor='password'>Password</Label>
 
-          <Input
-            {...register("password")}
-            type='password'
-            className='text-slate-900'
-            id='password'
-            placeholder='Enter your Password'
-          />
+          <div className='relative'>
+            <label
+              className='absolute right-2 top-1 p-2 rounded-full transition duration-300 active:bg-zinc-300 cursor-pointer'
+              onClick={togglePassword}>
+              {showPassword ? (
+                <BsEyeFill className='fill-zinc-900' />
+              ) : (
+                <BsEyeSlashFill className='fill-zinc-900' />
+              )}
+            </label>
 
-          <span className='text-red-700 text-sm'>
-            {errors.password ? errors.password.message : null}
-          </span>
+            <Input
+              {...register("password")}
+              type={showPassword ? "text" : "password"}
+              className='text-slate-900'
+              id='password'
+              placeholder='Enter your Password'
+            />
+          </div>
+
+          <ul className='text-red-700 text-[0.632rem] list-disc pt-1'>
+            {errors.password ? <li>{errors.password.message}</li> : null}
+            {isAuthError ? <li>{model === "Sign In" && errMessage.split(" ").at(2)}</li> : null}
+          </ul>
         </div>
         <Button
           type='submit'
           variant='default'
           className='w-full flex gap-2 justify-center mt-5'>
-          {generateLoadingBooleans() ? (
+          {loadBool ? (
             <>
               <span>Please Wait</span>
               <AiOutlineLoading3Quarters className='animate-spin' />

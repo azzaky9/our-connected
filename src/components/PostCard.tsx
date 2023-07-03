@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { Button } from "./ui/button";
+import { Button } from "../components/ui/button";
 import { BiSolidLike } from "react-icons/bi";
 import { FcLike } from "react-icons/fc";
 
@@ -19,7 +19,7 @@ interface TPostCard {
 
 const PostCard: React.FC<TPostCard> = ({ uploadedName, datePost, title, content }) => {
   return (
-    <Card className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 hover:scale-105  transition duration-300'>
+    <Card className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 transition duration-300'>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>

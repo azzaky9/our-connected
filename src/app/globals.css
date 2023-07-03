@@ -15,3 +15,7 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-zinc-900 hover:bg-zinc-900/40 rounded-[10px];
 }
+
+input#file-upload-button {
+  bakcground-color: #ffdfdf !important;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast } from "../components/ui/toastutils/use-toast";
+import { useToast } from "@/components/ui/toastutils/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import { PiWarningFill } from "react-icons/pi";

@@ -9,7 +9,7 @@ const page = () => {
       Not already have account? you can sign up
       <Link
         className='text-blue-600'
-        href='/register/signup'>
+        href='./signup'>
         {" "}
         here
       </Link>
