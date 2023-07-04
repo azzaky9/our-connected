@@ -19,3 +19,11 @@
 input#file-upload-button {
   bakcground-color: #ffdfdf !important;
 }
+
+.custom_input-style {
+  @apply outline-none border-b-2 border-zinc-700/80 bg-transparent py-2 px-3  placeholder:text-gray-800 hover:placeholder:text-gray-400 active:border-zinc-600/100 hover:border-zinc-600/100;
+}
+
+input::file-selector-button {
+  @apply bg-slate-900 py-3 border-none outline-none rounded-sm text-white px-2;
+}
