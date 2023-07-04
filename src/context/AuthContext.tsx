@@ -1,17 +1,21 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, SetStateAction } from "react";
 import { auth } from "@/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "@/firebase/config";
 
 type TUserAuth = {
-  email: string;
-  uid: string;
+  profilePath: string | null;
+  email: string | null;
+  uid: string | null;
 };
 
 interface TContextInitalValue {
-  user: TUserAuth | null;
+  user: TUserAuth;
   clearUser: () => void;
+  setProfilePath: (path: string) => void;
 }
 
 const AuthContext = createContext({} as TContextInitalValue);
@@ -21,15 +25,27 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<TContextInitalValue["user"]>(null);
+  const [currentUser, setCurrentUser] = useState<TUserAuth>({
+    email: null,
+    profilePath: null,
+    uid: null
+  });
 
-  const clear = () => setCurrentUser(null);
+  const clear = () =>
+    setCurrentUser({
+      email: null,
+      profilePath: null,
+      uid: null
+    });
+
+  const setProfilePath = (path: string) =>
+    setCurrentUser((prevState) => ({ ...prevState, profilePath: path }));
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      // const profileRef = ref(storage, `profiles/${}`)
       if (user?.email) {
-        console.log(user);
-        setCurrentUser({ email: user.email, uid: user.uid });
+        setCurrentUser((prevState) => ({ ...prevState, email: user.email, uid: user.uid }));
       } else {
         clear();
       }
@@ -40,7 +56,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     <AuthContext.Provider
       value={{
         user: currentUser,
-        clearUser: clear
+        clearUser: clear,
+        setProfilePath: setProfilePath
       }}>
       {children}
     </AuthContext.Provider>

@@ -14,7 +14,7 @@ const Profile = () => {
   const { mutationSignOut } = useFirebaseAuth();
   const { user } = useAuth();
 
-  const initial = user?.email.at(0);
+  const initial = user?.email?.at(0);
 
   return (
     <Popover>

@@ -9,6 +9,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 import { useCallback, useState } from "react";
 import { BsEyeSlashFill, BsEyeFill } from "react-icons/bs";
+import React from "react";
 
 export type FormInput = {
   email: string;
@@ -56,8 +57,6 @@ const Form: React.FC<TFormProps> = ({ model }) => {
     } else {
       mutationRegister.mutate({ email: inputValue.email, password: inputValue.password });
     }
-
-    resetField("password");
   });
 
   const generateLoadingBooleans = useCallback(() => {
@@ -79,7 +78,7 @@ const Form: React.FC<TFormProps> = ({ model }) => {
         <div className='flex flex-col space-y-3'>
           <Label htmlFor='email'>@ Email</Label>
           <Input
-            {...register("email")}
+            {...register("email", { required: true })}
             className='text-slate-900'
             type='email'
             id='email'
@@ -102,7 +101,7 @@ const Form: React.FC<TFormProps> = ({ model }) => {
             </label>
 
             <Input
-              {...register("password")}
+              {...register("password", { maxLength: 8 })}
               type={showPassword ? "text" : "password"}
               className='text-slate-900'
               id='password'
@@ -120,15 +119,15 @@ const Form: React.FC<TFormProps> = ({ model }) => {
           variant='default'
           className='w-full flex gap-2 justify-center mt-5'>
           {loadBool ? (
-            <>
+            <React.Fragment>
               <span>Please Wait</span>
               <AiOutlineLoading3Quarters className='animate-spin' />
-            </>
+            </React.Fragment>
           ) : (
-            <>
+            <React.Fragment>
               <MdOutlineMail fontSize='1.182rem' />
               <span>{model === "Sign In" ? "Sign in" : "Sign up"}</span>
-            </>
+            </React.Fragment>
           )}
         </Button>
       </div>
