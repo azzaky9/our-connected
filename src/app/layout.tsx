@@ -18,7 +18,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.className} bg-gradient-to-br  from-zinc-900 to-slate-950`}>
         <Providers>
           <AuthProvider>
-            <Navbar />
             {children}
             <Toaster />
           </AuthProvider>
