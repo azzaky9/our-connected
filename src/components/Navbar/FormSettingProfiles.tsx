@@ -47,7 +47,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
       className='grid gap-4'
       onSubmit={onSubmit}>
       <Label className='grid grid-cols-4 place-content-center '>
-        <Pict size={64} />
+        <Pict size='medium' />
         {!onEdit ? (
           <div className='col-span-3 mt-4'>
             <h5>{user.name}</h5>
