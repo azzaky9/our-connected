@@ -2,9 +2,8 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
-import { ref, getDownloadURL } from "firebase/storage";
-import { storage } from "@/firebase/config";
 import { memo } from "react";
+import { FiUser } from "react-icons/fi";
 
 type TPictProps = { size?: "default" | "medium" | "large" };
 
@@ -13,7 +12,7 @@ const Pict: React.FC<TPictProps> = memo(({ size }) => {
 
   const sizedMapping = {
     default: "",
-    medium: "h-[48px] w-[48px]",
+    medium: "h-[52px] w-[52px]",
     large: "h-[68px] w-[68px]"
   };
 
@@ -24,7 +23,9 @@ const Pict: React.FC<TPictProps> = memo(({ size }) => {
           src={user.profilePath}
           alt={`@z`}
         />
-        <AvatarFallback className='text-white bg-rose-600'>z</AvatarFallback>
+        <AvatarFallback className='text-white bg-zinc-600 text-lg'>
+          <FiUser />
+        </AvatarFallback>
       </Avatar>
     </div>
   );

@@ -1,8 +1,10 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, SetStateAction, useMemo } from "react";
-import { auth } from "@/firebase/config";
+import { auth, fireStore, storage } from "@/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { getDownloadURL, ref } from "firebase/storage";
 
 type TUnion = string | null;
 
@@ -16,13 +18,18 @@ type TUserAuth = {
 
 export type TPublicProfileInfo = Pick<TUserAuth, "username" | "name">;
 
+interface DocumentTypesUsers {
+  name: string;
+  username: string;
+  profile_path: string;
+}
+
 type TCredential = Omit<TUserAuth, "profilePath">;
 
 interface TContextInitalValue {
   user: TUserAuth;
   clearUser: () => void;
   updateDispatchState: (newState: SetStateAction<TUserAuth>) => void;
-  setDataUser: (data: TCredential) => void;
 }
 
 const AuthContext = createContext({} as TContextInitalValue);
@@ -54,40 +61,45 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setCurrentUser(newState);
   };
 
-  const setDataUser = (data: TCredential) => {
-    const { email, uid, name, username } = data;
-
-    if (name && username) {
-      setCurrentUser((prevState) => ({ ...prevState, name: name, username: username }));
-    } else {
-      setCurrentUser((prevState) => ({ ...prevState, email: email, uid: uid }));
-    }
-  };
-
-  // const setProfilePath = (path: string) =>
-  //   setCurrentUser((prevState) => ({ ...prevState, profilePath: path }));
-
-  const z = useMemo(() => {
+  const isObjectUserChanged = useMemo(() => {
     currentUser;
   }, [currentUser]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setCurrentUser((prevState) => ({ ...prevState, email: user.email, uid: user.uid }));
+        const userDocRef = doc(fireStore, "users", user.uid);
+        const docSnapshot = await getDoc(userDocRef);
+
+        if (docSnapshot.exists()) {
+          const userData = docSnapshot.data() as DocumentTypesUsers;
+
+          const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
+          const { email, uid } = user;
+          const { name, profile_path, username } = userData;
+
+          const updateStateValue = {
+            email: email,
+            uid: uid,
+            username: username,
+            name: name,
+            profilePath: profile_path !== "" ? downloadedUrl : ""
+          };
+
+          updateDispatchState(updateStateValue);
+        }
       } else {
         clear();
       }
     });
-  }, [z]);
+  }, [isObjectUserChanged]);
 
   return (
     <AuthContext.Provider
       value={{
         user: currentUser,
         clearUser: clear,
-        updateDispatchState: updateDispatchState,
-        setDataUser: setDataUser
+        updateDispatchState: updateDispatchState
       }}>
       {children}
     </AuthContext.Provider>

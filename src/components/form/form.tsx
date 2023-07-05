@@ -47,8 +47,7 @@ const Form: React.FC<TFormProps> = ({ model }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    resetField
+    formState: { errors }
   } = useForm<FormInput>({ resolver });
 
   const onSubmits = handleSubmit((inputValue) => {

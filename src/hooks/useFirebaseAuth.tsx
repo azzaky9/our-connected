@@ -52,9 +52,13 @@ const useFirebaseAuth = () => {
 
     if (docSnapshot.exists()) {
       const userData = docSnapshot.data() as DocumentTypesUsers;
-      const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
 
-      setProfileData(userData.username, userData.name, downloadedUrl);
+      if (userData.profile_path !== "") {
+        const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
+        setProfileData(userData.username, userData.name, downloadedUrl);
+      } else {
+        setProfileData(userData.username, userData.name, userData.profile_path);
+      }
 
       return router.push("/feeds");
     }
@@ -71,7 +75,9 @@ const useFirebaseAuth = () => {
 
         generateToast({ message: "Redirecting", variant: "info" });
       } catch (err) {
-        if (err instanceof FirebaseError) setErrMessage(err.message);
+        if (err instanceof FirebaseError) {
+          setErrMessage(err.message);
+        }
 
         setIsAuthError(true);
       }
@@ -82,7 +88,7 @@ const useFirebaseAuth = () => {
     mutationFn: async ({ email, password }: FormInput) => {
       return createUserWithEmailAndPassword(auth, email, password)
         .then(() => {
-          router.replace("/register/signin");
+          router.push("/register/signin");
           generateToast({ message: "Successfully Created!, redirecting..", variant: "success" });
         })
         .catch((err) => {
@@ -97,9 +103,9 @@ const useFirebaseAuth = () => {
     mutationFn: async () => {
       return signOut(auth)
         .then(() => {
-          clearUser();
+          router.push("/register/signin");
           generateToast({ variant: "success", message: "Succes Log Out" });
-          router.replace("/register/signin");
+          clearUser();
         })
         .catch((err) => {
           generateToast({ variant: "error", message: err.message });

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, memo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -13,11 +12,9 @@ import {
 } from "@/components/ui/sheet";
 import { ButtonHTMLAttributes } from "react";
 import { GoPencil } from "react-icons/go";
-import { useAuth } from "@/context/AuthContext";
 import { FormSettingProfiles } from "./index";
 
 export const ProfileSettings = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
 
   const toggleEditMode = () => setIsEdit(!isEdit);
@@ -25,7 +22,7 @@ export const ProfileSettings = ({ children }: { children: React.ReactNode }) => 
   const handleCloseProfileSetting = () => setIsEdit(false);
 
   return (
-    <Sheet>
+    <Sheet onOpenChange={() => handleCloseProfileSetting()}>
       {children}
       <SheetContent side='left'>
         <SheetHeader>

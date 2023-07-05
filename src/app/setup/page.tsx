@@ -18,7 +18,7 @@ import { useUpload } from "@/hooks/useUpload";
 import { TUploadIdentity } from "@/hooks/useUpload";
 import { useRouter } from "next/navigation";
 
-type TInputValue = { userName: string; name: string };
+// type TInputValue = { userName: string; name: string };
 
 const Page = () => {
   const { uploadUserIdentity } = useUpload();
@@ -32,12 +32,11 @@ const Page = () => {
 
   const onSubmit = handleSubmit((inputValue) => {
     const { name, username } = inputValue;
+    const { mutateAsync } = uploadUserIdentity;
 
-    uploadUserIdentity.mutate({ name: name, username: username });
-
-    if (!uploadUserIdentity.isLoading) {
+    mutateAsync({ name: name, username: username }).then(() => {
       router.push("/feeds");
-    }
+    });
   });
 
   return (

@@ -44,9 +44,11 @@ const useUpload = () => {
 
           await uploadBytes(folderRef, file[0]);
 
-          uploadUserIdentity.mutate({ name: name, username: username, file_path: pathRef });
-
-          generateToast({ message: "Successfully upload profile", variant: "success" });
+          await uploadUserIdentity.mutateAsync({
+            name: name,
+            username: username,
+            file_path: pathRef
+          });
         } catch (error) {
           if (error instanceof FirebaseError)
             generateToast({ message: "Oops something went wrong", variant: "error" });

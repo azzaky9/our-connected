@@ -1,21 +1,16 @@
 "use client";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IoLogOutOutline } from "react-icons/io5";
 import { BiUser } from "react-icons/bi";
 import { Button } from "@/components/ui/button";
 import useFirebaseAuth from "@/hooks/useFirebaseAuth";
-import { useAuth } from "@/context/AuthContext";
 import { SheetTrigger } from "../ui/sheet";
 import ProfileSettings from "@/components/Navbar/ProfileSettings";
 import Pict from "./Pict";
 
 const Profile = () => {
   const { mutationSignOut } = useFirebaseAuth();
-  const { user } = useAuth();
-
-  const initial = user?.email?.at(0);
 
   return (
     <Popover>

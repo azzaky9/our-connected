@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { useUpload } from "@/hooks/useUpload";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 export type RegisteringAssetsType = {
   username: string;
@@ -32,6 +33,13 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
   } = useForm<RegisteringAssetsType>();
   const { user } = useAuth();
 
+  useEffect(() => {
+    if (!onEdit) {
+      console.log("triggerd");
+      return reset();
+    }
+  }, [onEdit, reset]);
+
   const onSubmit = handleSubmit((data) => {
     const { file, name, username } = data;
     const { mutateAsync } = uploadProfile;
@@ -46,10 +54,10 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
     <form
       className='grid gap-4'
       onSubmit={onSubmit}>
-      <Label className='grid grid-cols-4 place-content-center '>
+      <Label className='grid grid-cols-4 place-content-center'>
         <Pict size='medium' />
         {!onEdit ? (
-          <div className='col-span-3 mt-4'>
+          <div className='col-span-3 mt-3'>
             <h5>{user.name}</h5>
             <span className='text-gray-600 text-sm pt-2'>@{user.username}</span>
           </div>
