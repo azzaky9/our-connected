@@ -15,26 +15,14 @@ import { ButtonHTMLAttributes } from "react";
 import { GoPencil } from "react-icons/go";
 import { useAuth } from "@/context/AuthContext";
 import { FormSettingProfiles } from "./index";
-import { useForm, Resolver } from "react-hook-form";
-
-type TResolverParams = {
-  file: File;
-};
 
 export const ProfileSettings = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<TResolverParams>();
 
-  const onSubmit = handleSubmit(({ file }) => {
-    if (!errors) console.log(file);
-  });
+  const toggleEditMode = () => setIsEdit(!isEdit);
 
-  const handleEdit = () => setIsEdit(!isEdit);
+  const handleCloseProfileSetting = () => setIsEdit(false);
 
   return (
     <Sheet>
@@ -47,16 +35,14 @@ export const ProfileSettings = ({ children }: { children: React.ReactNode }) => 
           </SheetDescription>
         </SheetHeader>
         <div className='py-4'>
-          <FormSettingProfiles isEdit={isEdit} />
+          <FormSettingProfiles
+            onEdit={isEdit}
+            closeEditModeHandler={handleCloseProfileSetting}
+          />
         </div>
         <SheetFooter>
           <div className='flex gap-2'>
-            <Button
-              type='submit'
-              onClick={onSubmit}>
-              Save changes
-            </Button>
-            <EditButtons onClick={handleEdit}>{!isEdit ? "Edit" : "Undo"}</EditButtons>
+            <EditButtons onClick={toggleEditMode}>{isEdit ? "Undo" : "Edit"}</EditButtons>
           </div>
         </SheetFooter>
       </SheetContent>

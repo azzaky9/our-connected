@@ -2,66 +2,67 @@
 
 import { Label } from "../ui/label";
 import { Pict } from "./index";
-import { Input } from "../ui/input";
-import { useAuth } from "@/context/AuthContext";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
-import { storage } from "@/firebase/config";
-import Image from "next/image";
 import { useUpload } from "@/hooks/useUpload";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useAuth } from "@/context/AuthContext";
 
-type RegisteringAssetsType = {
+export type RegisteringAssetsType = {
   username: string;
   name: string;
-  file: FileList;
+  file?: FileList;
 };
 
 interface FormSettingProfilesProps {
-  isEdit: boolean;
+  onEdit: boolean;
+  closeEditModeHandler: () => void;
 }
 
-const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({ isEdit }) => {
+const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
+  onEdit,
+  closeEditModeHandler
+}) => {
   const { uploadProfile } = useUpload();
-
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<RegisteringAssetsType>();
+  const { user } = useAuth();
 
   const onSubmit = handleSubmit((data) => {
     const { file, name, username } = data;
+    const { mutateAsync } = uploadProfile;
 
-    uploadProfile.mutate({ name: name, username: username, file: file });
+    mutateAsync({ file: file, username: username, name: name }).then(() => {
+      reset();
+      closeEditModeHandler();
+    });
   });
-
-  if (!isEdit) {
-    return (
-      <div className='grid grid-cols-5'>
-        <Pict />
-        <div className='col-span-4'>
-          <h5 className='text-sm'>Ucok Selalu Always</h5>
-          <span className='text-gray-500'>@ucok</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <form
       className='grid gap-4'
       onSubmit={onSubmit}>
       <Label className='grid grid-cols-4 place-content-center '>
-        <Pict />
-        <input
-          type='file'
-          className='col-span-3 custom_input-style text-zinc-700 active:text-white hover:cursor-pointer'
-          placeholder='New Name'
-          {...register("file", { required: true })}
-        />
+        <Pict size={64} />
+        {!onEdit ? (
+          <div className='col-span-3 mt-4'>
+            <h5>{user.name}</h5>
+            <span className='text-gray-600 text-sm pt-2'>@{user.username}</span>
+          </div>
+        ) : (
+          <input
+            type='file'
+            className='col-span-3 custom_input-style text-zinc-700 active:text-white hover:cursor-pointer'
+            placeholder='New Name'
+            {...register("file", { required: true })}
+          />
+        )}
       </Label>
-      <Label className='grid grid-cols-4 place-content-center'>
+      <Label className={`${onEdit ? "grid" : "hidden"} grid-cols-4 place-content-center`}>
         <span className='pt-1 text-sm'>User Name</span>
         <input
           type='text'
@@ -70,7 +71,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({ isEdit }) => 
           {...register("username", { required: true })}
         />
       </Label>
-      <Label className='grid grid-cols-4 place-content-center'>
+      <Label className={`${onEdit ? "grid" : "hidden"} grid-cols-4 place-content-center`}>
         <span className='pt-1 text-sm'>Name</span>
         <input
           type='text'
@@ -80,8 +81,9 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({ isEdit }) => 
         />
       </Label>
       <Button
-        disabled={uploadProfile.isLoading && true}
-        type='submit'>
+        disabled={uploadProfile.isLoading}
+        type='submit'
+        className={`${onEdit ? "grid" : "hidden"}`}>
         {uploadProfile.isLoading ? (
           <AiOutlineLoading3Quarters className='animate-spin' />
         ) : (

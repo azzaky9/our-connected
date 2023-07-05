@@ -9,6 +9,7 @@ import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 import { useAuth } from "@/context/AuthContext";
 import { SheetTrigger } from "../ui/sheet";
 import ProfileSettings from "@/components/Navbar/ProfileSettings";
+import Pict from "./Pict";
 
 const Profile = () => {
   const { mutationSignOut } = useFirebaseAuth();
@@ -21,13 +22,9 @@ const Profile = () => {
       <PopoverTrigger
         className='hover:cursor-pointer'
         asChild>
-        <Avatar>
-          <AvatarImage
-            src=''
-            alt={`@${initial}`}
-          />
-          <AvatarFallback className='text-white bg-rose-600'>{initial}</AvatarFallback>
-        </Avatar>
+        <div>
+          <Pict />
+        </div>
       </PopoverTrigger>
       <PopoverContent className='w-[180px] p-0  text-slate-50 shadow-sm border-slate-800 bg-gray-900 '>
         <div className='flex flex-col text-sm'>
