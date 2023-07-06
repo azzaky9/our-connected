@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import { storage, fireStore } from "@/firebase/config";
-import { collection, doc, setDoc, getDoc, where, query, getDocs } from "firebase/firestore";
+import { collection, doc, setDoc, where, query, getDocs } from "firebase/firestore";
 import { useMutation } from "react-query";
 import useCustomToast from "./useCustomToast";
 import { FirebaseError } from "firebase/app";
@@ -24,18 +24,21 @@ const useUpload = () => {
   const { setProfileData } = useFirebaseAuth();
   const router = useRouter();
 
-  // const checkUsernameTaken = async (username: string) => {
-  //   const collectionRef = collection(fireStore, "users");
-  //   const q = query(collectionRef, where("username", "==", username));
-  //   const querySnapshot = await getDocs(q);
+  const checkUsernameAvailability = async (username: string) => {
+    try {
+      const usersCollectionRef = collection(fireStore, "users");
+      const q = query(usersCollectionRef, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
 
-  //   console.log(querySnapshot);
-  // };
+      return querySnapshot.empty;
+    } catch (error) {
+      console.error("Error checking username availability:", error);
+      throw error;
+    }
+  };
 
   const uploadProfile = useMutation({
     mutationFn: async ({ file, name, username }: RegisteringAssetsType) => {
-      // reference folder for keeping content firebase
-
       if (file) {
         try {
           const fileName = file[0].name;
@@ -51,7 +54,7 @@ const useUpload = () => {
           });
         } catch (error) {
           if (error instanceof FirebaseError)
-            generateToast({ message: "Oops something went wrong", variant: "error" });
+            generateToast({ message: error.message, variant: "error" });
         }
       }
     }
@@ -81,7 +84,7 @@ const useUpload = () => {
     }
   });
 
-  return { uploadProfile, uploadUserIdentity };
+  return { uploadProfile, uploadUserIdentity, checkUsernameAvailability };
 };
 
 export { useUpload };
