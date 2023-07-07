@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useMutation } from "react-query";
 import { auth, storage } from "@/firebase/config";
 import { FormInput } from "@/components/form/form";
@@ -45,25 +45,25 @@ const useFirebaseAuth = () => {
   };
 
   const directUser = async (user: User) => {
-    setCredentialUser(user.email, user.uid);
-
     const userDocRef = doc(fireStore, "users", user.uid);
     const docSnapshot = await getDoc(userDocRef);
+    const isDocumentExist = docSnapshot.exists();
+    const userData = docSnapshot.data() as DocumentTypesUsers;
 
-    if (docSnapshot.exists()) {
-      const userData = docSnapshot.data() as DocumentTypesUsers;
+    if (isDocumentExist) {
+      const isProfileValid = Boolean(userData.profile_path);
 
-      if (userData.profile_path !== "") {
+      if (isProfileValid) {
         const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
         setProfileData(userData.username, userData.name, downloadedUrl);
       } else {
-        setProfileData(userData.username, userData.name, userData.profile_path);
+        setProfileData(userData.username, userData.name, "");
       }
 
       return router.push("/feeds");
     }
 
-    router.push("/setup");
+    router.push(`/setup?v=${user.uid}`);
   };
 
   const mutationLogin = useMutation({
@@ -71,7 +71,10 @@ const useFirebaseAuth = () => {
       try {
         const { user } = await signInWithEmailAndPassword(auth, email, password);
 
-        if (user) directUser(user);
+        if (user) {
+          setCredentialUser(user.email, user.uid);
+          directUser(user);
+        }
 
         generateToast({ message: "Redirecting", variant: "info" });
       } catch (err) {

@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import { storage, fireStore } from "@/firebase/config";
-import { collection, doc, setDoc, where, query, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  setDoc,
+  where,
+  query,
+  getDocs,
+  updateDoc,
+  arrayUnion
+} from "firebase/firestore";
 import { useMutation } from "react-query";
 import useCustomToast from "./useCustomToast";
 import { FirebaseError } from "firebase/app";
@@ -18,11 +26,16 @@ export interface TUploadIdentity {
   file_path?: string;
 }
 
+interface TArgsUploadContent {
+  title: string;
+  content: string;
+}
+
 const useUpload = () => {
   const { user } = useAuth();
   const { generateToast } = useCustomToast();
   const { setProfileData } = useFirebaseAuth();
-  const router = useRouter();
+  const cloudStorageKey = process.env.NEXT_PUBLIC_STORAGE_ID;
 
   const checkUsernameAvailability = async (username: string) => {
     try {
@@ -47,7 +60,7 @@ const useUpload = () => {
 
           await uploadBytes(folderRef, file[0]);
 
-          await uploadUserIdentity.mutateAsync({
+          uploadUserIdentity.mutate({
             name: name,
             username: username,
             file_path: pathRef
@@ -64,27 +77,62 @@ const useUpload = () => {
     mutationFn: async ({ name, username, file_path }: TUploadIdentity) => {
       try {
         if (user.uid) {
-          const userDocRef = doc(fireStore, "users", user?.uid);
+          const userDocRef = doc(fireStore, "users", user.uid);
+          const isPathValid = Boolean(file_path);
 
-          await setDoc(userDocRef, {
-            name: name,
-            username: username,
-            profile_path: file_path ? file_path : ""
-          });
+          if (isPathValid) {
+            const downloadedUrl = await getDownloadURL(ref(storage, file_path));
 
-          const downloadedUrl = await getDownloadURL(ref(storage, file_path));
+            await setDoc(userDocRef, {
+              name: name,
+              username: username,
+              profile_path: downloadedUrl
+            });
+          } else {
+            await setDoc(userDocRef, {
+              name: name,
+              username: username,
+              profile_path: ""
+            });
 
-          if (file_path) setProfileData(username, name, downloadedUrl);
+            setProfileData(name, username, "");
+          }
 
           generateToast({ message: "Successfully upload..", variant: "success" });
         }
       } catch (error) {
-        console.error(error);
+        generateToast({ message: "Oops Something went wrong", variant: "error" });
       }
     }
   });
 
-  return { uploadProfile, uploadUserIdentity, checkUsernameAvailability };
+  const uploadContent = useMutation({
+    mutationFn: async ({ content, title }: TArgsUploadContent) => {
+      try {
+        const contentsField = {
+          id: "",
+          title: title,
+          content: content,
+          createdAt: Date.now(),
+          whoPosted: "",
+          like_count: 0,
+          love_count: 0
+        };
+
+        const documentRef = doc(fireStore, "posts", "feeds_documents");
+
+        await updateDoc(documentRef, {
+          feeds: arrayUnion(contentsField)
+        });
+
+        generateToast({ message: "Successfully Upload", variant: "success" });
+      } catch (error) {
+        if (error instanceof FirebaseError) console.log(error.message);
+      }
+    }
+  });
+
+  return { uploadProfile, uploadUserIdentity, uploadContent, checkUsernameAvailability };
 };
 
 export { useUpload };

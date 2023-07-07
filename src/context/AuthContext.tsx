@@ -5,6 +5,7 @@ import { auth, fireStore, storage } from "@/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
+import { usePathname } from "next/navigation";
 
 type TUnion = string | null;
 
@@ -39,6 +40,8 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const currentPath = usePathname();
+  const [path, setPath] = useState("");
   const [currentUser, setCurrentUser] = useState<TUserAuth>({
     email: null,
     profilePath: "",
@@ -65,6 +68,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     currentUser;
   }, [currentUser]);
 
+  const getProfile = async (userData: DocumentTypesUsers) => {
+    if (userData.profile_path) {
+      const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
+
+      return Boolean(downloadedUrl) ? setPath(downloadedUrl) : setPath("");
+    }
+  };
+
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -74,16 +85,17 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (docSnapshot.exists()) {
           const userData = docSnapshot.data() as DocumentTypesUsers;
 
-          const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
+          await getProfile(userData);
+
           const { email, uid } = user;
-          const { name, profile_path, username } = userData;
+          const { name, username } = userData;
 
           const updateStateValue = {
             email: email,
             uid: uid,
             username: username,
             name: name,
-            profilePath: profile_path !== "" ? downloadedUrl : ""
+            profilePath: path
           };
 
           updateDispatchState(updateStateValue);
@@ -92,7 +104,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         clear();
       }
     });
-  }, [isObjectUserChanged]);
+  }, [isObjectUserChanged, path]);
 
   return (
     <AuthContext.Provider
