@@ -15,7 +15,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <body className={`${inter.className} bg-gradient-to-br  from-zinc-900 to-slate-950`}>
+      <body className={`${inter.className} bg-gradient-to-br  from-zinc-900 to-slate-950 `}>
         <Providers>
           <AuthProvider>
             {children}

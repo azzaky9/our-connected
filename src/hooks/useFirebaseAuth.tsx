@@ -60,7 +60,7 @@ const useFirebaseAuth = () => {
         setProfileData(userData.username, userData.name, "");
       }
 
-      return router.push("/feeds");
+      return router.push("/view/feeds");
     }
 
     router.push(`/setup?v=${user.uid}`);

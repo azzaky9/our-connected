@@ -1,7 +1,5 @@
 "use client";
 
-import { useAuth } from "@/context/AuthContext";
-import React from "react";
 import { Card, CardContent, CardDescription, CardTitle, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,8 +8,6 @@ import { useForm } from "react-hook-form";
 import { useUpload } from "@/hooks/useUpload";
 import { TUploadIdentity } from "@/hooks/useUpload";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
-import withAuth from "./HOC/withAuth";
 
 // type TInputValue = { userName: string; name: string };
 
@@ -32,7 +28,7 @@ const SetupComponents = () => {
 
     mutateAsync({ name: name, username: username })
       .then(() => {
-        router.push("/feeds");
+        router.push("/view/feeds");
       })
       .catch(() => {});
   });

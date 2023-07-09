@@ -11,7 +11,8 @@ import {
   query,
   getDocs,
   updateDoc,
-  arrayUnion
+  arrayUnion,
+  Timestamp
 } from "firebase/firestore";
 import { useMutation } from "react-query";
 import useCustomToast from "./useCustomToast";
@@ -19,8 +20,10 @@ import { FirebaseError } from "firebase/app";
 import { useRouter } from "next/navigation";
 import { RegisteringAssetsType } from "@/components/Navbar/FormSettingProfiles";
 import useFirebaseAuth from "./useFirebaseAuth";
+import { v4 as uuidv4 } from "uuid";
+import { format } from "date-fns";
 
-export interface TUploadIdentity {
+interface TUploadIdentity {
   name: string;
   username: string;
   file_path?: string;
@@ -31,11 +34,35 @@ interface TArgsUploadContent {
   content: string;
 }
 
+type LovedArrAttr = {
+  personId: string;
+  isPersonLoved: boolean;
+};
+
+interface LikedArrAttr extends Omit<LovedArrAttr, "isPersonLoved"> {
+  isPersonLiked: boolean;
+}
+
+interface ObjectFieldTypes {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: Timestamp | string;
+  whoPosted: {
+    idPerson: string;
+    profilePath: string;
+    username: string;
+  };
+  likeCount: Array<string>;
+  loveCount: Array<string>;
+}
+
+const documentRef = doc(fireStore, "posts", "feeds_documents");
+
 const useUpload = () => {
   const { user } = useAuth();
   const { generateToast } = useCustomToast();
   const { setProfileData } = useFirebaseAuth();
-  const cloudStorageKey = process.env.NEXT_PUBLIC_STORAGE_ID;
 
   const checkUsernameAvailability = async (username: string) => {
     try {
@@ -109,21 +136,26 @@ const useUpload = () => {
   const uploadContent = useMutation({
     mutationFn: async ({ content, title }: TArgsUploadContent) => {
       try {
+        const id = uuidv4();
+        const feedsCollectionRef = doc(fireStore, "feeds", id);
+
         const contentsField = {
-          id: "",
+          id: id,
           title: title,
           content: content,
-          createdAt: Date.now(),
-          whoPosted: "",
-          like_count: 0,
-          love_count: 0
+          createdAt: Timestamp.now(),
+          whoPosted: {
+            idPerson: `${user.uid}`,
+            profilePath: user.profilePath,
+            username: `${user.username}`
+          },
+          likeCount: arrayUnion(),
+          loveCount: arrayUnion()
         };
 
-        const documentRef = doc(fireStore, "posts", "feeds_documents");
+        console.log(contentsField);
 
-        await updateDoc(documentRef, {
-          feeds: arrayUnion(contentsField)
-        });
+        await setDoc(feedsCollectionRef, contentsField);
 
         generateToast({ message: "Successfully Upload", variant: "success" });
       } catch (error) {
@@ -135,4 +167,4 @@ const useUpload = () => {
   return { uploadProfile, uploadUserIdentity, uploadContent, checkUsernameAvailability };
 };
 
-export { useUpload };
+export { useUpload, documentRef, type ObjectFieldTypes, type TUploadIdentity };
