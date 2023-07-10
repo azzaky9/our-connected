@@ -16,6 +16,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaThumbsUp, FaRegThumbsUp } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 type StateAttributeTypes = "alreadyLove" | "alreadyLike";
 
@@ -30,16 +31,10 @@ export interface ParamWithCondition extends TInterestHandleParam {
 
 const Card = memo(
   ({ withButton, dataSource }: { withButton: boolean; dataSource: ObjectFieldTypes }) => {
-    const [interest, setInterest] = useState({
-      alreadyLove: false,
-      alreadyLike: false
-    });
-    const [valid, setIsValid] = useState(false);
+    const { user } = useAuth();
 
     const currentPath = usePathname();
-    const { incrementInterest, undoInterest, checkUserExistOnField } = useInteractPost(
-      dataSource.id
-    );
+    const { incrementInterest, undoInterest } = useInteractPost(dataSource.id);
 
     const renderLongText = (
       <Link
@@ -49,49 +44,6 @@ const Card = memo(
       </Link>
     );
 
-    const likeObjectParam: TInterestHandleParam = {
-      propertyType: "likeCount",
-      stateAttr: "alreadyLike"
-    };
-
-    const loveObjectParam: TInterestHandleParam = {
-      propertyType: "loveCount",
-      stateAttr: "alreadyLove"
-    };
-
-    const undoLoveParam: ParamWithCondition = {
-      ...loveObjectParam,
-      stateCondition: interest.alreadyLove
-    };
-
-    const undoLikeParam: ParamWithCondition = {
-      ...likeObjectParam,
-      stateCondition: interest.alreadyLike
-    };
-
-    function modifiedInterest(condition: boolean, attr: StateAttributeTypes) {
-      setInterest((prevState) => ({
-        ...prevState,
-        [attr]: condition
-      }));
-    }
-
-    const handleInterestBtn = ({ propertyType, stateAttr }: TInterestHandleParam) => {
-      modifiedInterest(true, stateAttr);
-      incrementInterest(propertyType);
-    };
-
-    const handleUndoInterestBtn = ({
-      propertyType,
-      stateAttr,
-      stateCondition
-    }: ParamWithCondition) => {
-      if (stateCondition) {
-        modifiedInterest(false, stateAttr);
-        undoInterest(propertyType);
-      }
-    };
-
     function showReadButton() {
       const countContentLength = dataSource.content.split(" ").length;
 
@@ -99,18 +51,6 @@ const Card = memo(
         return renderLongText;
       }
     }
-
-    const checkUserAlreadyInteract = async () => {
-      const exist = await checkUserExistOnField();
-
-      if (typeof exist === "boolean" && exist) setIsValid(true);
-
-      setIsValid(false);
-    };
-
-    useEffect(() => {
-      checkUserAlreadyInteract();
-    }, []);
 
     const renderOverflowClasses = currentPath === "/view/feeds" ? "h-24 overflow-hidden" : "";
 
@@ -133,28 +73,28 @@ const Card = memo(
           <div className='flex justify-between items-center w-full'>
             <div className='flex gap-5'>
               <span className='flex gap-2 items-center'>
-                {valid ? (
+                {dataSource.loveCount.includes(user.uid ?? "") ? (
                   <AiFillHeart
-                    onClick={() => handleUndoInterestBtn(undoLoveParam)}
+                    onClick={() => undoInterest("love")}
                     className='text-xl text-rose-500 transition duration-150 scale-110 cursor-pointer'
                   />
                 ) : (
                   <AiOutlineHeart
-                    onClick={() => handleInterestBtn(loveObjectParam)}
+                    onClick={() => incrementInterest("love")}
                     className='text-xl text-gray-700 transition duration-75 cursor-pointer '
                   />
                 )}
                 {dataSource.loveCount.length}
               </span>
               <span className='flex gap-2 items-center'>
-                {interest.alreadyLike ? (
+                {dataSource.likeCount.includes(user.uid ?? "") ? (
                   <FaThumbsUp
-                    onClick={() => handleUndoInterestBtn(undoLikeParam)}
+                    onClick={() => undoInterest("like")}
                     className='text-lg text-blue-700 transition duration-150 scale-105 cursor-pointer'
                   />
                 ) : (
                   <FaRegThumbsUp
-                    onClick={() => handleInterestBtn(likeObjectParam)}
+                    onClick={() => incrementInterest("like")}
                     className='text-lg text-gray-700 transition duration-75 cursor-pointer '
                   />
                 )}

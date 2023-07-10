@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import { fireStore as db } from "@/firebase/config";
 import {
   increment,
@@ -17,55 +18,75 @@ import { MdDocumentScanner } from "react-icons/md";
 
 export type ParamInterestTypes = "loveCount" | "likeCount";
 
+type StateKeyTypes = "alreadyLove" | "alreadyLike";
+
 const useInteractPost = (docsId: string) => {
   const { user } = useAuth();
   const docsRef = doc(db, "feeds", docsId);
+  const [interest, setInterest] = useState({
+    alreadyLove: false,
+    alreadyLike: false
+  });
 
   const checkUserExistOnField = async () => {
-    try {
-      const documents = await getDoc(docsRef);
+    const documents = await getDoc(docsRef);
 
-      if (documents.exists()) {
-        const docSnapshot = documents.data() as ObjectFieldTypes;
-        const findIndexUser = docSnapshot.loveCount.findIndex((pid) => pid === user.uid);
-        return findIndexUser >= 0 ? true : false;
-      }
-    } catch (error) {
-      if (error instanceof FirebaseError) throw error.message;
+    if (documents.exists()) {
+      const docSnapshot = documents.data() as ObjectFieldTypes;
+      const isUserOnLoveField = docSnapshot.loveCount.find((personId) => personId === user.uid);
+      const isUserOnLikeField = docSnapshot.likeCount.find((personId) => personId === user.uid);
+      return { isUserOnLikeField, isUserOnLoveField };
     }
   };
 
-  const incrementInterest = (interestType: ParamInterestTypes) => {
-    checkUserExistOnField()
-      .then((isUserOnField) => {
-        if (typeof isUserOnField === "boolean") {
-          if (!isUserOnField) {
-            updateDoc(docsRef, {
-              [interestType]: arrayUnion(user.uid)
-            }).then(() => console.log("successfully Created"));
-          }
-        }
-      })
-      .catch((err) => console.error(err));
+  const modifiedInterest = (condition: boolean, attr: string) => {
+    setInterest((prevState) => ({
+      ...prevState,
+      [attr]: condition
+    }));
   };
 
-  const undoInterest = (interestType: ParamInterestTypes) => {
-    checkUserExistOnField()
-      .then((isUserOnField) => {
-        if (typeof isUserOnField === "boolean") {
-          if (isUserOnField) {
-            updateDoc(docsRef, {
-              [interestType]: arrayRemove(user.uid)
-            })
-              .then(() => console.log("successfully removed"))
-              .catch((err) => console.error(err));
-          }
-        }
-      })
-      .catch((err) => console.error(err));
+  const getSpecifyAction = (modelFn: "like" | "love") => {
+    const chooseModel =
+      modelFn === "like"
+        ? { interestType: "likeCount", setStateKey: "alreadyLike" }
+        : {
+            interestType: "loveCount",
+            setStateKey: "alreadyLove"
+          };
+
+    return chooseModel;
   };
 
-  return { incrementInterest, undoInterest, checkUserExistOnField };
+  const incrementInterest = (modelFn: "like" | "love") => {
+    const action = getSpecifyAction(modelFn);
+
+    checkUserExistOnField().then((person) => {
+      updateDoc(docsRef, {
+        [action.interestType]: arrayUnion(user.uid)
+      })
+        .then(() => {
+          modifiedInterest(true, action.setStateKey);
+        })
+        .catch((err) => (err instanceof FirebaseError ? err : null));
+    });
+  };
+
+  const undoInterest = (modelFn: "like" | "love") => {
+    const action = getSpecifyAction(modelFn);
+
+    checkUserExistOnField().then((person) => {
+      updateDoc(docsRef, {
+        [action.interestType]: arrayRemove(user.uid)
+      })
+        .then(() => {
+          modifiedInterest(false, action.setStateKey);
+        })
+        .catch((err) => (err instanceof FirebaseError ? err : null));
+    });
+  };
+
+  return { incrementInterest, undoInterest, interest };
 };
 
 export { useInteractPost };
