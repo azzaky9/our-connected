@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useUpload } from "@/hooks/useUpload";
-import { TUploadIdentity } from "@/hooks/useUpload";
+import { TUploadIdentity } from "@/types/type";
 import { useRouter } from "next/navigation";
 
 // type TInputValue = { userName: string; name: string };

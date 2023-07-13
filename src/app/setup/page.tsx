@@ -3,7 +3,6 @@ import SetupComponents from "@/components/SetupComponents";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
 
 // type TInputValue = { userName: string; name: string };
 
