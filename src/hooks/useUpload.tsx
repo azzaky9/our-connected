@@ -10,54 +10,16 @@ import {
   where,
   query,
   getDocs,
-  updateDoc,
   arrayUnion,
   Timestamp
 } from "firebase/firestore";
 import { useMutation } from "react-query";
 import useCustomToast from "./useCustomToast";
 import { FirebaseError } from "firebase/app";
-import { useRouter } from "next/navigation";
 import { RegisteringAssetsType } from "@/components/Navbar/FormSettingProfiles";
 import useFirebaseAuth from "./useFirebaseAuth";
 import { v4 as uuidv4 } from "uuid";
-import { format } from "date-fns";
-
-interface TUploadIdentity {
-  name: string;
-  username: string;
-  file_path?: string;
-}
-
-interface TArgsUploadContent {
-  title: string;
-  content: string;
-}
-
-type LovedArrAttr = {
-  personId: string;
-  isPersonLoved: boolean;
-};
-
-interface LikedArrAttr extends Omit<LovedArrAttr, "isPersonLoved"> {
-  isPersonLiked: boolean;
-}
-
-interface ObjectFieldTypes {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: Timestamp | string;
-  whoPosted: {
-    idPerson: string;
-    profilePath: string;
-    username: string;
-  };
-  likeCount: Array<string>;
-  loveCount: Array<string>;
-}
-
-const documentRef = doc(fireStore, "posts", "feeds_documents");
+import { TArgsUploadContent, TUploadIdentity } from "@/types/type";
 
 const useUpload = () => {
   const { user } = useAuth();
@@ -113,19 +75,20 @@ const useUpload = () => {
             await setDoc(userDocRef, {
               name: name,
               username: username,
-              profile_path: downloadedUrl
+              profile_path: downloadedUrl,
+              isPersonSuperUser: user.isPersonSuperUser
             });
+            setProfileData(name, username, downloadedUrl);
           } else {
             await setDoc(userDocRef, {
               name: name,
               username: username,
-              profile_path: ""
+              profile_path: "",
+              isPersonSuperUser: user.isPersonSuperUser
             });
 
             setProfileData(name, username, "");
           }
-
-          generateToast({ message: "Successfully upload..", variant: "success" });
         }
       } catch (error) {
         generateToast({ message: "Oops Something went wrong", variant: "error" });
@@ -145,9 +108,7 @@ const useUpload = () => {
           content: content,
           createdAt: Timestamp.now(),
           whoPosted: {
-            idPerson: `${user.uid}`,
-            profilePath: user.profilePath,
-            username: `${user.username}`
+            userRef: `/users/${user.uid}`
           },
           likeCount: arrayUnion(),
           loveCount: arrayUnion()
@@ -156,10 +117,8 @@ const useUpload = () => {
         console.log(contentsField);
 
         await setDoc(feedsCollectionRef, contentsField);
-
-        generateToast({ message: "Successfully Upload", variant: "success" });
       } catch (error) {
-        if (error instanceof FirebaseError) console.log(error.message);
+        if (error instanceof FirebaseError) throw error.message;
       }
     }
   });
@@ -167,4 +126,4 @@ const useUpload = () => {
   return { uploadProfile, uploadUserIdentity, uploadContent, checkUsernameAvailability };
 };
 
-export { useUpload, documentRef, type ObjectFieldTypes, type TUploadIdentity };
+export { useUpload };

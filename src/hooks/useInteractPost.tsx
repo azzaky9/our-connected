@@ -1,28 +1,18 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { fireStore as db } from "@/firebase/config";
-import {
-  increment,
-  doc,
-  updateDoc,
-  getDoc,
-  collection,
-  arrayUnion,
-  arrayRemove
-} from "firebase/firestore";
-import { FirebaseError } from "firebase/app";
+import { doc, updateDoc, getDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
-import { ObjectFieldTypes } from "./useUpload";
-import { MdDocumentScanner } from "react-icons/md";
-
-export type ParamInterestTypes = "loveCount" | "likeCount";
-
-type StateKeyTypes = "alreadyLove" | "alreadyLike";
+import { ObjectFieldTypes } from "@/types/type";
 
 const useInteractPost = (docsId: string) => {
   const { user } = useAuth();
   const docsRef = doc(db, "feeds", docsId);
+  const [lastInterestCount, setLastInterestCount] = useState({
+    loveCount: 0,
+    likeCount: 0
+  });
   const [interest, setInterest] = useState({
     alreadyLove: false,
     alreadyLike: false
@@ -67,8 +57,13 @@ const useInteractPost = (docsId: string) => {
       })
         .then(() => {
           modifiedInterest(true, action.setStateKey);
+          setLastInterestCount((prevState) => ({
+            ...prevState,
+            [action.interestType]:
+              modelFn === "like" ? lastInterestCount.likeCount + 1 : lastInterestCount.loveCount + 1
+          }));
         })
-        .catch((err) => (err instanceof FirebaseError ? err : null));
+        .catch((err) => console.log(err));
     });
   };
 
@@ -81,12 +76,33 @@ const useInteractPost = (docsId: string) => {
       })
         .then(() => {
           modifiedInterest(false, action.setStateKey);
+          setLastInterestCount((prevState) => ({
+            ...prevState,
+            [action.interestType]:
+              modelFn === "like" ? lastInterestCount.likeCount - 1 : lastInterestCount.loveCount - 1
+          }));
         })
-        .catch((err) => (err instanceof FirebaseError ? err : null));
+        .catch((err) => console.log(err));
     });
   };
 
-  return { incrementInterest, undoInterest, interest };
+  useEffect(() => {
+    const getLastLenghtInterest = async () => {
+      const documents = await getDoc(docsRef);
+
+      if (documents.exists()) {
+        const docSnapshot = documents.data() as ObjectFieldTypes;
+        setLastInterestCount({
+          likeCount: docSnapshot.likeCount.length,
+          loveCount: docSnapshot.loveCount.length
+        });
+      }
+    };
+
+    getLastLenghtInterest();
+  }, [docsRef]);
+
+  return { incrementInterest, undoInterest, interest, lastInterestCount };
 };
 
 export { useInteractPost };

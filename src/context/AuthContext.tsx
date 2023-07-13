@@ -15,17 +15,17 @@ type TUserAuth = {
   name: TUnion;
   email: TUnion;
   uid: TUnion;
+  isPersonSuperUser: boolean;
 };
 
 export type TPublicProfileInfo = Pick<TUserAuth, "username" | "name">;
 
-interface DocumentTypesUsers {
+export interface DocumentTypesUsers {
   name: string;
   username: string;
   profile_path: string;
+  isPersonSuperUser: boolean;
 }
-
-type TCredential = Omit<TUserAuth, "profilePath">;
 
 interface TContextInitalValue {
   user: TUserAuth;
@@ -47,7 +47,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     profilePath: "",
     uid: null,
     name: null,
-    username: null
+    username: null,
+    isPersonSuperUser: false
   });
 
   const clear = () => {
@@ -56,7 +57,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       profilePath: "",
       uid: null,
       name: null,
-      username: null
+      username: null,
+      isPersonSuperUser: false
     });
   };
 
@@ -88,14 +90,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await getProfile(userData);
 
           const { email, uid } = user;
-          const { name, username } = userData;
+          const { name, username, isPersonSuperUser } = userData;
 
           const updateStateValue = {
             email: email,
             uid: uid,
             username: username,
             name: name,
-            profilePath: path
+            profilePath: path,
+            isPersonSuperUser: isPersonSuperUser
           };
 
           updateDispatchState(updateStateValue);

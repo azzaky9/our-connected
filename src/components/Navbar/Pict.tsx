@@ -21,7 +21,7 @@ const Pict: React.FC<TPictProps> = memo(({ size }) => {
       <Avatar className={size ? sizedMapping[size] : sizedMapping["default"]}>
         <AvatarImage
           src={user.profilePath}
-          alt={`@z`}
+          alt={`@${user.username}`}
         />
         <AvatarFallback className='text-white bg-zinc-600 text-lg'>
           <FiUser />

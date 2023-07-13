@@ -90,10 +90,12 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
     checkUsernameAvailability(username)
       .then((isUsernameAvalable) => {
         if (isUsernameAvalable) {
-          mutateAsync({ file: file, username: username, name: name }).then(() => {
-            reset();
-            closeEditModeHandler();
-          });
+          mutateAsync({ file: file, username: username, name: name })
+            .then(() => {
+              reset();
+              closeEditModeHandler();
+            })
+            .then(() => generateToast({ message: "Successfully Upload", variant: "success" }));
         } else {
           generateToast({
             message: "Failed",
