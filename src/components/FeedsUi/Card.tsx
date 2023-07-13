@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import {
   Card as ParentCard,
@@ -21,14 +21,13 @@ import { useMutation } from "react-query";
 import { Skeleton } from "../ui/skeleton";
 import { Sparkles } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
-import { useQuery } from "react-query";
 import { type DocumentTypesUsers } from "@/context/AuthContext";
 import Link from "next/link";
 import { FirebaseError } from "firebase/app";
 
 interface BlogCardPropTypes {
   withButton: boolean;
-  isLoading: boolean;
+  isLoading?: boolean;
   dataSource: ObjectFieldTypes;
 }
 
@@ -44,20 +43,17 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
 
   const docsRef = doc(db, "feeds", dataSource.id);
 
-  console.log(dataSource.whoPosted.userRef);
-
   const userDocument = dataSource.whoPosted.userRef;
   const splitted: string[] = userDocument.trim().split("/");
 
   const documentRef = doc(db, splitted[1], splitted[2]);
 
-  const getUserProfile = async () => {
+  const getUserProfile = useCallback(async () => {
     try {
       const response = await getDoc(documentRef);
 
       if (response.exists()) {
         const result = response.data() as DocumentTypesUsers;
-        console.log(result);
 
         setProfiles(result);
       }
@@ -66,11 +62,12 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
     } catch (error) {
       if (error instanceof FirebaseError) console.log(error.message);
     }
-  };
+  }, [profiles]); // eslint-disable-line
 
   useEffect(() => {
     getUserProfile();
-  }, []);
+  }, []); // eslint-disable-line
+
   const putNewUserOnInterestField = useMutation({
     mutationKey: "interactWithInterest",
     mutationFn: async () => {
@@ -172,7 +169,7 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
             ))}
           </div>
         ) : (
-          <article className={`${renderOverflowClasses} `}>{dataSource.content}</article>
+          <article className={renderOverflowClasses}>{dataSource.content}</article>
         )}
         {showReadButton()}
       </CardContent>
