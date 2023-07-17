@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent } from "../ui/card";
+import { Card, CardHeader, CardTitle, CardFooter, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 
 const SkeletonCard = () => {

@@ -131,8 +131,6 @@ const useUpload = () => {
         const feedsCollectionRef = doc(fireStore, "feeds", id);
         const replaceNewLine = content.replace(/\n/g, "__NEWLINE__");
 
-        console.log(replaceNewLine);
-
         const contentsField = {
           id: id,
           title: title,
@@ -144,8 +142,6 @@ const useUpload = () => {
           likeCount: arrayUnion(),
           loveCount: arrayUnion()
         };
-
-        console.log(contentsField);
 
         await setDoc(feedsCollectionRef, contentsField);
       } catch (error) {
