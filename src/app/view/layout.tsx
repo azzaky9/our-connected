@@ -1,11 +1,14 @@
+import React from "react";
 import Navbar from "@/components/Navbar";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <section>
-      <Navbar />
+    <React.Fragment>
+      <header>
+        <Navbar />
+      </header>
       {children}
-    </section>
+    </React.Fragment>
   );
 };
 

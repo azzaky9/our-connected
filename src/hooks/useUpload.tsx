@@ -11,20 +11,25 @@ import {
   query,
   getDocs,
   arrayUnion,
-  Timestamp
+  Timestamp,
+  updateDoc
 } from "firebase/firestore";
 import { useMutation } from "react-query";
 import useCustomToast from "./useCustomToast";
 import { FirebaseError } from "firebase/app";
 import { RegisteringAssetsType } from "@/components/Navbar/FormSettingProfiles";
-import useFirebaseAuth from "./useFirebaseAuth";
+import { UseFormReset } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { TArgsUploadContent, TUploadIdentity } from "@/types/type";
+
+interface ArgumentClosedHandler extends RegisteringAssetsType {
+  closeEditModeHandler: () => void;
+  reset: UseFormReset<RegisteringAssetsType>;
+}
 
 const useUpload = () => {
   const { user } = useAuth();
   const { generateToast } = useCustomToast();
-  const { setProfileData } = useFirebaseAuth();
 
   const checkUsernameAvailability = async (username: string) => {
     try {
@@ -39,56 +44,79 @@ const useUpload = () => {
     }
   };
 
+  const updateProfile = useMutation({
+    mutationFn: async ({ filePath, name, username }: TUploadIdentity) => {
+      try {
+        if (user.uid) {
+          const userDocRef = doc(fireStore, "users", user.uid);
+          const downloadedUrl = await getDownloadURL(ref(storage, filePath));
+
+          updateDoc(userDocRef, {
+            profilePath: downloadedUrl,
+            username: username,
+            name: name
+          });
+        }
+      } catch (error) {
+        if (error instanceof Error) console.error(error.message);
+      }
+    }
+  });
+
   const uploadProfile = useMutation({
-    mutationFn: async ({ file, name, username }: RegisteringAssetsType) => {
+    mutationFn: async ({
+      file,
+      name,
+      username,
+      closeEditModeHandler,
+      reset
+    }: ArgumentClosedHandler) => {
       if (file) {
         try {
+          const usernameExist = await checkUsernameAvailability(username);
+
+          if (!usernameExist) throw new Error("Name already used, try another username");
+
           const fileName = file[0].name;
           const pathRef = `${user?.uid}/profiles/${fileName}`;
           const folderRef = ref(storage, pathRef);
 
           await uploadBytes(folderRef, file[0]);
 
-          uploadUserIdentity.mutate({
+          await updateProfile.mutateAsync({
             name: name,
             username: username,
-            file_path: pathRef
+            filePath: pathRef
           });
+
+          reset();
+          closeEditModeHandler();
+          generateToast({ message: "Success update profile", variant: "success" });
         } catch (error) {
-          if (error instanceof FirebaseError)
-            generateToast({ message: error.message, variant: "error" });
+          if (error instanceof Error)
+            generateToast({
+              message: "username already used, try another username",
+              variant: "error"
+            });
         }
       }
     }
   });
 
-  const uploadUserIdentity = useMutation({
-    mutationFn: async ({ name, username, file_path }: TUploadIdentity) => {
+  const uploadDefaultDocument = useMutation({
+    mutationFn: async ({ name, username, filePath }: TUploadIdentity) => {
       try {
         if (user.uid) {
+          console.log("trigger");
+
           const userDocRef = doc(fireStore, "users", user.uid);
-          const isPathValid = Boolean(file_path);
 
-          if (isPathValid) {
-            const downloadedUrl = await getDownloadURL(ref(storage, file_path));
-
-            await setDoc(userDocRef, {
-              name: name,
-              username: username,
-              profile_path: downloadedUrl,
-              isPersonSuperUser: user.isPersonSuperUser
-            });
-            setProfileData(name, username, downloadedUrl);
-          } else {
-            await setDoc(userDocRef, {
-              name: name,
-              username: username,
-              profile_path: "",
-              isPersonSuperUser: user.isPersonSuperUser
-            });
-
-            setProfileData(name, username, "");
-          }
+          await setDoc(userDocRef, {
+            name: name,
+            username: username,
+            profilePath: filePath,
+            isPersonSuperUser: false
+          });
         }
       } catch (error) {
         generateToast({ message: "Oops Something went wrong", variant: "error" });
@@ -101,11 +129,14 @@ const useUpload = () => {
       try {
         const id = uuidv4();
         const feedsCollectionRef = doc(fireStore, "feeds", id);
+        const replaceNewLine = content.replace(/\n/g, "__NEWLINE__");
+
+        console.log(replaceNewLine);
 
         const contentsField = {
           id: id,
           title: title,
-          content: content,
+          content: replaceNewLine,
           createdAt: Timestamp.now(),
           whoPosted: {
             userRef: `/users/${user.uid}`
@@ -123,7 +154,13 @@ const useUpload = () => {
     }
   });
 
-  return { uploadProfile, uploadUserIdentity, uploadContent, checkUsernameAvailability };
+  return {
+    uploadProfile,
+    updateProfile,
+    uploadDefaultDocument,
+    uploadContent,
+    checkUsernameAvailability
+  };
 };
 
 export { useUpload };

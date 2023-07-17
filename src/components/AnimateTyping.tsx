@@ -1,11 +1,11 @@
 "use client";
 
-import { memo } from "react";
+import React, { memo } from "react";
 import { TypeAnimation } from "react-type-animation";
 
-const AnimateTyping = () => {
+const AnimateTyping = memo(function AnimateTyping() {
   return (
-    <>
+    <React.Fragment>
       <h3 className='text-[6.5rem]'>Create.</h3>
       <h3 className='text-[7rem]'>Post.</h3>
       <TypeAnimation
@@ -15,10 +15,8 @@ const AnimateTyping = () => {
         repeat={1}
         className='text-white font-semibold text-[8rem]'
       />
-    </>
+    </React.Fragment>
   );
-};
+});
 
-const AnimateType = memo(AnimateTyping);
-
-export default AnimateType;
+export default AnimateTyping;

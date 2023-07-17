@@ -67,7 +67,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
   closeEditModeHandler
 }) => {
   const { generateToast } = useCustomToast();
-  const { uploadProfile, checkUsernameAvailability } = useUpload();
+  const { uploadProfile, updateProfile } = useUpload();
   const {
     register,
     handleSubmit,
@@ -84,27 +84,9 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
   }, [onEdit, reset]);
 
   const onSubmit = handleSubmit((data) => {
-    const { file, name, username } = data;
-    const { mutateAsync } = uploadProfile;
+    const { mutate, isSuccess, isLoading } = uploadProfile;
 
-    checkUsernameAvailability(username)
-      .then((isUsernameAvalable) => {
-        if (isUsernameAvalable) {
-          mutateAsync({ file: file, username: username, name: name })
-            .then(() => {
-              reset();
-              closeEditModeHandler();
-            })
-            .then(() => generateToast({ message: "Successfully Upload", variant: "success" }));
-        } else {
-          generateToast({
-            message: "Failed",
-            description: "username already taken",
-            variant: "error"
-          });
-        }
-      })
-      .catch((err) => console.error(err));
+    mutate({ ...data, closeEditModeHandler, reset });
   });
 
   const ErrMessage = ({ msg }: { msg?: string }) => (

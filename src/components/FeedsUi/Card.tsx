@@ -15,7 +15,7 @@ import { ObjectFieldTypes } from "@/types/type";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { doc, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore";
+import { doc, updateDoc, arrayRemove, arrayUnion, getDoc, Timestamp } from "firebase/firestore";
 import { fireStore as db } from "@/firebase/config";
 import { useMutation } from "react-query";
 import { Skeleton } from "../ui/skeleton";
@@ -35,7 +35,7 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
   const { user } = useAuth();
 
   const lovedArr = dataSource.loveCount;
-
+  const contents = dataSource.content.replace(/__NEWLINE__/g, "\n");
   const currentPath = usePathname();
   const [lovedTotal, setLovedTotal] = useState(lovedArr.length);
   const [isUserLoved, setIsUserLoved] = useState(false);
@@ -92,7 +92,7 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
   );
 
   function showReadButton() {
-    const countContentLength = dataSource.content.split(" ").length;
+    const countContentLength = contents.split(" ").length;
 
     if (currentPath === "/view/feeds" && countContentLength > 50) {
       return renderLongText;
@@ -145,32 +145,14 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
   return (
     <ParentCard className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 transition duration-300'>
       <CardHeader>
-        <CardTitle>
-          {isLoading ? <Skeleton className='w-[120px] h-[10px] bg-zinc-700' /> : dataSource.title}
-        </CardTitle>
+        <CardTitle>{dataSource.title}</CardTitle>
         <CardDescription className='text-sm flex gap-2'>
-          {isLoading ? (
-            <Skeleton className='bg-zinc-700 w-[62px] h-[10px]' />
-          ) : (
-            <div className='flex items-center gap-2'>
-              {createSuperUserStars} <span>{profiles?.username}</span>
-            </div>
-          )}
+          <span className='flex items-center gap-2'>{createSuperUserStars}</span>
+          <span>{profiles?.username}</span>
         </CardDescription>
       </CardHeader>
       <CardContent className='text-sm relative'>
-        {isLoading ? (
-          <div className='flex flex-col gap-3'>
-            {["w-[85%]", "w-3/4", "w-[80%]", "w-[50%]"].map((itemUnit) => (
-              <Skeleton
-                key={itemUnit}
-                className={`${itemUnit} h-[10px] bg-zinc-700`}
-              />
-            ))}
-          </div>
-        ) : (
-          <article className={renderOverflowClasses}>{dataSource.content}</article>
-        )}
+        <article className={`${renderOverflowClasses} whitespace-pre-wrap`}>{contents}</article>
         {showReadButton()}
       </CardContent>
       <CardFooter>
@@ -191,13 +173,10 @@ const Card: React.FC<BlogCardPropTypes> = ({ isLoading, withButton, dataSource }
 
               {lovedTotal}
             </span>
-            {isLoading ? (
-              <Skeleton className='bg-zinc-700 w-[72px] h-[10px]' />
-            ) : (
-              <span className='text-gray-500 px-4'>
-                Created At: {typeof dataSource.createdAt === "string" && dataSource.createdAt}
-              </span>
-            )}
+
+            <span className='text-gray-500 px-4'>
+              Created At: {dataSource.createdAt.toDate().toLocaleDateString()}
+            </span>
           </div>
 
           {withButton ? (

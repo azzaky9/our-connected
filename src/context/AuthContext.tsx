@@ -23,7 +23,7 @@ export type TPublicProfileInfo = Pick<TUserAuth, "username" | "name">;
 export interface DocumentTypesUsers {
   name: string;
   username: string;
-  profile_path: string;
+  profilePath: string;
   isPersonSuperUser: boolean;
 }
 
@@ -71,8 +71,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [currentUser]);
 
   const getProfile = async (userData: DocumentTypesUsers) => {
-    if (userData.profile_path) {
-      const downloadedUrl = await getDownloadURL(ref(storage, userData.profile_path));
+    if (userData.profilePath) {
+      const downloadedUrl = await getDownloadURL(ref(storage, userData.profilePath));
 
       return Boolean(downloadedUrl) ? setPath(downloadedUrl) : setPath("");
     }

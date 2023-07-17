@@ -1,11 +1,13 @@
 "use client";
 
+import React from "react";
 import { getDocs, collection, orderBy, query } from "firebase/firestore";
 import { fireStore as db } from "@/firebase/config";
 import { ObjectFieldTypes } from "@/types/type";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import Card from "./Card";
+import SkeletonCard from "./SkeletonCard";
 
 // type DataTypes = { data: ObjectFieldTypes[] };
 
@@ -17,7 +19,7 @@ const CardCollection = () => {
     const querySnapshot = await getDocs(q);
 
     const feeds = querySnapshot.docs.map((doc) => {
-      return { ...doc.data(), createdAt: doc.data().createdAt.toDate().toLocaleDateString() };
+      return doc.data();
     }) as ObjectFieldTypes[];
 
     setPostSource(feeds);
@@ -26,16 +28,19 @@ const CardCollection = () => {
   const { isLoading } = useQuery("feeds", getFeeds);
 
   return (
-    <article>
-      {postSource.map((post) => (
-        <Card
-          key={post.id}
-          isLoading={isLoading}
-          dataSource={post}
-          withButton
-        />
-      ))}
-    </article>
+    <React.Fragment>
+      {isLoading ? (
+        <SkeletonCard />
+      ) : (
+        postSource.map((sourceValue) => (
+          <Card
+            dataSource={sourceValue}
+            withButton
+            key={sourceValue.id}
+          />
+        ))
+      )}
+    </React.Fragment>
   );
 };
 

@@ -3,7 +3,7 @@ import { Timestamp, DocumentReference } from "firebase/firestore";
 interface TUploadIdentity {
   name: string;
   username: string;
-  file_path?: string;
+  filePath: string;
 }
 
 interface TArgsUploadContent {
@@ -13,7 +13,7 @@ interface TArgsUploadContent {
 
 interface ObjectFieldTypes extends Pick<TArgsUploadContent, "content" | "title"> {
   id: string;
-  createdAt: Timestamp | string;
+  createdAt: Timestamp;
   whoPosted: {
     userRef: string;
   };

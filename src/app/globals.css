@@ -27,3 +27,7 @@ input#file-upload-button {
 input::file-selector-button {
   @apply bg-slate-900 py-3 border-none outline-none rounded-sm text-white px-2;
 }
+
+.animate-template {
+  transition: all cubic-bezier(0.455, 0.03, 0.515, 0.955) 500ms;
+}
