@@ -9,7 +9,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { Resolver, FieldError } from "react-hook-form";
-import useCustomToast from "@/hooks/useCustomToast";
+import { Input } from "../ui/input";
 
 export type RegisteringAssetsType = {
   username: string;
@@ -66,8 +66,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
   onEdit,
   closeEditModeHandler
 }) => {
-  const { generateToast } = useCustomToast();
-  const { uploadProfile, updateProfile } = useUpload();
+  const { uploadProfile } = useUpload();
   const {
     register,
     handleSubmit,
@@ -84,7 +83,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
   }, [onEdit, reset]);
 
   const onSubmit = handleSubmit((data) => {
-    const { mutate, isSuccess, isLoading } = uploadProfile;
+    const { mutate } = uploadProfile;
 
     mutate({ ...data, closeEditModeHandler, reset });
   });
@@ -93,45 +92,52 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
     <li className='text-[0.7rem] text-red-700 list-disc'>{msg}</li>
   );
 
+  const showEditMode = onEdit ? "grid" : "hidden";
+
   return (
     <form
       className='grid gap-4'
       onSubmit={onSubmit}>
-      <Label className='grid grid-cols-4 place-content-center'>
+      <div className='grid grid-cols-4'>
         <Pict size='medium' />
-        {!onEdit ? (
-          <div className='col-span-3 mt-3'>
+        {onEdit ? (
+          <Input
+            type='file'
+            className='col-span-3 border-slate-700 border-2 placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+            {...register("file", { required: "file must required" })}
+          />
+        ) : (
+          <div className='col-span-3'>
             <h5>{user.name}</h5>
             <span className='text-gray-600 text-sm pt-2'>@{user.username}</span>
           </div>
-        ) : (
-          <input
-            type='file'
-            className='col-span-3 custom_input-style text-zinc-700 active:text-white hover:cursor-pointer'
-            placeholder='New Name'
-            accept=''
-            {...register("file", { required: "file must required" })}
-          />
         )}
-      </Label>
-      <Label className={`${onEdit ? "grid" : "hidden"} grid-cols-4 place-content-center`}>
-        <span className='pt-1 text-sm'>User Name</span>
-        <input
+      </div>
+      <div className={showEditMode}>
+        <Label className='pt-1 text-sm flex gap-1'>
+          <span className='text-red-600'>*</span>username
+        </Label>
+
+        <Input
           type='text'
-          className='col-span-3 custom_input-style'
-          placeholder='Set new User Name'
+          className='border-slate-700 border-2 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+          placeholder='new username'
           {...register("username", { required: "username must be required" })}
         />
-      </Label>
-      <Label className={`${onEdit ? "grid" : "hidden"} grid-cols-4 place-content-center`}>
-        <span className='pt-1 text-sm'>Name</span>
-        <input
+      </div>
+      <div className={showEditMode}>
+        <Label className='pt-1 text-sm flex gap-1'>
+          <span className='text-red-600'>*</span>name
+        </Label>
+
+        <Input
           type='text'
-          className='col-span-3 custom_input-style'
-          placeholder='Set New Name'
+          autoComplete='off'
+          className='border-slate-700 border-2 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+          placeholder='new name'
           {...register("name", { required: "name must be required" })}
         />
-      </Label>
+      </div>
       <Button
         disabled={uploadProfile.isLoading}
         type='submit'

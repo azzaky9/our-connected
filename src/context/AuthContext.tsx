@@ -5,7 +5,6 @@ import { auth, fireStore, storage } from "@/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
-import { usePathname } from "next/navigation";
 
 type TUnion = string | null;
 
@@ -40,7 +39,6 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const currentPath = usePathname();
   const [path, setPath] = useState("");
   const [currentUser, setCurrentUser] = useState<TUserAuth>({
     email: null,

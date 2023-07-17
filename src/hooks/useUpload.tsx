@@ -21,6 +21,7 @@ import { RegisteringAssetsType } from "@/components/Navbar/FormSettingProfiles";
 import { UseFormReset } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { TArgsUploadContent, TUploadIdentity } from "@/types/type";
+import useFirebaseAuth from "./useFirebaseAuth";
 
 interface ArgumentClosedHandler extends RegisteringAssetsType {
   closeEditModeHandler: () => void;
@@ -28,7 +29,7 @@ interface ArgumentClosedHandler extends RegisteringAssetsType {
 }
 
 const useUpload = () => {
-  const { user } = useAuth();
+  const { user, updateDispatchState } = useAuth();
   const { generateToast } = useCustomToast();
 
   const checkUsernameAvailability = async (username: string) => {
@@ -51,11 +52,18 @@ const useUpload = () => {
           const userDocRef = doc(fireStore, "users", user.uid);
           const downloadedUrl = await getDownloadURL(ref(storage, filePath));
 
-          updateDoc(userDocRef, {
+          await updateDoc(userDocRef, {
             profilePath: downloadedUrl,
             username: username,
             name: name
           });
+
+          updateDispatchState((prevState) => ({
+            ...prevState,
+            name: name,
+            username: username,
+            profilePath: downloadedUrl
+          }));
         }
       } catch (error) {
         if (error instanceof Error) console.error(error.message);
