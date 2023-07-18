@@ -27,7 +27,6 @@ const GetSpecificBlog = ({ blogId }: { blogId: string }) => {
         <Card
           dataSource={data}
           withButton={false}
-          isLoading={isLoading}
         />
       ) : (
         <p>Blog Not Found</p>
