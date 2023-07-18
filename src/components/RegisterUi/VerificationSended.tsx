@@ -3,7 +3,6 @@
 import { MailCheck } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { useState } from "react";
 
 interface TVerificationSendedProp {
   email: string;
@@ -20,9 +19,11 @@ const VerificationSended: React.FC<TVerificationSendedProp> = ({ email, operatio
     <div className='z-10 w-full grid place-content-center text-center absolute top-0 pt-6 px-14 gap-3'>
       <div className='w-full flex justify-center items-center'>
         <MailCheck
-          className={`self-center  animate-template ${delayedDesc.at(0)} opacity-0 ${
-            operationSuccess ? "opacity-100" : ""
-          }`}
+          className={
+            "self-center  animate-template" + delayedDesc.at(0) + "opacity-0" + operationSuccess
+              ? "opacity-100"
+              : ""
+          }
         />
       </div>
       <span

@@ -1,4 +1,4 @@
-import SignupScreen from "@/components/RegisterUi/SignupScreen";
+import SignupScreen from "./SignupScreen";
 
 const page = () => {
   return (

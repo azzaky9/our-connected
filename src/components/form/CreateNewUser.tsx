@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 // import { onAuthStateChanged } from "firebase/auth";
 import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 import { AtSign, Lock, User2, Loader } from "lucide-react";
-import { type LoginValuesInput } from "./LoginComponent";
+import { type LoginValuesInput } from "./LoginForm";
 import { useRouter } from "next/navigation";
 
 import VerificationSended from "../RegisterUi/VerificationSended";

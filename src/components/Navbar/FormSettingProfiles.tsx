@@ -103,7 +103,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
         {onEdit ? (
           <Input
             type='file'
-            className='col-span-3 border-slate-700 border-2 placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+            className='col-span-3 input-styles'
             {...register("file", { required: "file must required" })}
           />
         ) : (
@@ -120,7 +120,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
 
         <Input
           type='text'
-          className='border-slate-700 border-2 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+          className='input-styles'
           placeholder='new username'
           {...register("username", { required: "username must be required" })}
         />
@@ -133,15 +133,15 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
         <Input
           type='text'
           autoComplete='off'
-          className='border-slate-700 border-2 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+          className='input-styles'
           placeholder='new name'
           {...register("name", { required: "name must be required" })}
         />
       </div>
       <Button
         disabled={uploadProfile.isLoading}
-        type='submit'
-        className={`${onEdit ? "grid" : "hidden"}`}>
+        className={showEditMode}
+        type='submit'>
         {uploadProfile.isLoading ? (
           <AiOutlineLoading3Quarters className='animate-spin' />
         ) : (

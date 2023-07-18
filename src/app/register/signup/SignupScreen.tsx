@@ -1,5 +1,5 @@
 import React from "react";
-import CreateNewUserForm from "../form/CreateNewUser";
+import CreateNewUserForm from "@/components/form/CreateNewUser";
 
 const SignupScreen = () => {
   return (

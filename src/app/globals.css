@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .input-styles {
+    @apply border-slate-800 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }

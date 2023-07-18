@@ -1,4 +1,4 @@
-import { Timestamp, DocumentReference } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
 interface TUploadIdentity {
   name: string;
@@ -11,7 +11,7 @@ interface TArgsUploadContent {
   content: string;
 }
 
-interface ObjectFieldTypes extends Pick<TArgsUploadContent, "content" | "title"> {
+interface ObjectFieldTypes extends TArgsUploadContent {
   id: string;
   createdAt: Timestamp;
   whoPosted: {

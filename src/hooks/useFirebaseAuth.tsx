@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "react-query";
 import { auth, fireStore, provider } from "@/firebase/config";
-import { type LoginValuesInput } from "@/components/form/LoginComponent";
+import { type LoginValuesInput } from "@/components/form/LoginForm";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import useCustomToast from "./useCustomToast";
@@ -73,8 +73,6 @@ const useFirebaseAuth = () => {
             default:
               setErrorAuthMessage("An error occured please check your credential again");
           }
-
-          console.log(err.code);
         }
 
         setIsAuthError(true);

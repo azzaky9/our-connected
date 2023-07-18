@@ -2,7 +2,7 @@ import CardCollection from "@/components/FeedsUi/CardCollection";
 
 const page = () => {
   return (
-    <main>
+    <main className='pt-20'>
       <CardCollection />
     </main>
   );

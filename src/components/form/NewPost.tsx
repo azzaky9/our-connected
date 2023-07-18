@@ -1,15 +1,5 @@
 "use client";
 
-/*
- * Structure Object
- * unique id
- * title
- * whoPosted
- * createdAt
- * description / content
- * love & like (inc)
- */
-
 import { useState } from "react";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "../ui/card";
@@ -91,14 +81,14 @@ const NewPost = () => {
               id='title'
               type='text'
               disabled={isLoading}
-              className='border-slate-800 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+              className='input-styles'
             />
             {errors.title && renderErrorMessage}
           </div>
           <div className='grid w-full gap-1.5'>
             <Textarea
               {...register("content", { required: true, onChange: () => clearErrors() })}
-              className='border-slate-800 resize-none bg-transparent shadow-[-1px_-43px_53px_-23px_rgba(0, 0, 0, 0.232)inset]  h-[220px] placeholder:text-zinc-600 text-white focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+              className='input-styles resize-none shadow-[-1px_-43px_53px_-23px_rgba(0, 0, 0, 0.232)inset]  h-[220px] '
               value={inputValue}
               onChange={handleChangeTextArea}
               disabled={isLoading}

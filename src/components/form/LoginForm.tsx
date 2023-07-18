@@ -34,7 +34,7 @@ const resolver: Resolver<LoginValuesInput> = async (values) => {
   };
 };
 
-const LoginComponent = () => {
+const LoginForm = () => {
   const { loginUser, signinWithGoogleAuth, errorAuthMessage, isAuthError } = useFirebaseAuth();
   const { isLoading, isError } = loginUser;
 
@@ -63,7 +63,7 @@ const LoginComponent = () => {
             type='email'
             placeholder='our-connected@connect.com'
             autoComplete='off'
-            className='border-slate-800 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+            className='input-styles'
           />
         </div>
         <div className='grid gap-2'>
@@ -73,7 +73,7 @@ const LoginComponent = () => {
             theme='light'
             id='password'
             autoComplete='off'
-            className='border-slate-800 w-full placeholder:text-sm bg-transparent text-white outline-none focus-visible:border focus-visible:border-zinc-800 ring-offset-slate-600'
+            className='input-styles'
           />
           {isAuthError ? (
             <span className='text-red-600 text-[0.700rem]'>{errorAuthMessage}</span>
@@ -107,4 +107,4 @@ const LoginComponent = () => {
   );
 };
 
-export default LoginComponent;
+export default LoginForm;

@@ -6,6 +6,7 @@ import { Skeleton } from "../ui/skeleton";
 
 const SkeletonCard = () => {
   const dummyCard = new Array(5).fill("");
+  const dummyParaghrapUnits = ["w-[85%]", "w-3/4", "w-80%", "w-[50%]"];
 
   return (
     <React.Fragment>
@@ -23,10 +24,12 @@ const SkeletonCard = () => {
           </CardHeader>
           <CardContent className='text-sm relative'>
             <div className='flex flex-col gap-3'>
-              <Skeleton className='w-[85%] h-[10px] bg-zinc-700' />
-              <Skeleton className='w-3/4 h-[10px] bg-zinc-700' />
-              <Skeleton className='w-[80%} h-[10px] bg-zinc-700' />
-              <Skeleton className='w-[50%] h-[10px] bg-zinc-700' />
+              {dummyParaghrapUnits.map((unit) => (
+                <Skeleton
+                  key={unit}
+                  className={unit + "h-[10px] bg-zinc-700"}
+                />
+              ))}
             </div>
           </CardContent>
           <CardFooter>
