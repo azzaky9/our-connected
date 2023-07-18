@@ -135,7 +135,9 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
   return (
     <ParentCard className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 transition duration-300'>
       <CardHeader>
-        <CardTitle>{dataSource.title}</CardTitle>
+        <CardTitle className='text-lg lg:text-2xl'>
+          {dataSource.title}
+        </CardTitle>
         <CardDescription className='text-sm flex gap-2'>
           <SuperUserStars isPersonSuperUser={profiles?.isPersonSuperUser} />
           <span>{profiles?.username}</span>
@@ -145,7 +147,7 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
         <article
           className={`${renderOverflowClasses} ${
             !isRouteOnHomepage && 'whitespace-pre-wrap'
-          }`}
+          } text-base`}
         >
           {contents}
         </article>
@@ -154,7 +156,7 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
       <CardFooter>
         <div className='flex justify-between items-center w-full'>
           <div className='flex gap-5'>
-            <span className='flex gap-2 items-center'>
+            <span className='flex gap-2 items-center select-none'>
               {isUserLoved ? (
                 <AiFillHeart
                   onClick={handleUndoInterest}
