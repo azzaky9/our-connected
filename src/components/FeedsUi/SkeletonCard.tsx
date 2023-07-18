@@ -27,7 +27,7 @@ const SkeletonCard = () => {
               {dummyParaghrapUnits.map((unit) => (
                 <Skeleton
                   key={unit}
-                  className={unit + "h-[10px] bg-zinc-700"}
+                  className={`${unit} h-[10px] bg-zinc-700`}
                 />
               ))}
             </div>
