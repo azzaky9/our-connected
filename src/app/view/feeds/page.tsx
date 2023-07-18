@@ -1,4 +1,4 @@
-import CardCollection from "@/components/FeedsUi/CardCollection";
+import CardCollection from '@/components/FeedsUi/CardCollection';
 
 const page = () => {
   return (
