@@ -1,17 +1,23 @@
-"use client";
+'use client';
 
-import React, { useCallback, useState, useEffect } from "react";
-import { useMutation } from "react-query";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useMutation } from 'react-query';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { doc, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore";
-import { FirebaseError } from "firebase/app";
-import { fireStore as db } from "@/firebase/config";
-import { useAuth } from "@/context/AuthContext";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  doc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
+  getDoc,
+} from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
+import { fireStore as db } from '@/firebase/config';
+import { useAuth } from '@/context/AuthContext';
 
-import { type ObjectFieldTypes, type TUploadIdentity } from "@/types/type";
-import { type DocumentTypesUsers } from "@/context/AuthContext";
+import { type ObjectFieldTypes, type TUploadIdentity } from '@/types/type';
+import { type DocumentTypesUsers } from '@/context/AuthContext';
 
 import {
   Card as ParentCard,
@@ -19,18 +25,18 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { Button } from "../ui/button";
-import { ShowNextReadButton, SuperUserStars } from "./utils";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '../ui/button';
+import { ShowNextReadButton, SuperUserStars } from './utils';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 
 interface BlogCardPropTypes {
   withButton: boolean;
   dataSource: ObjectFieldTypes;
 }
 
-interface ProfilesAttrTypes extends Omit<TUploadIdentity, "filePath"> {
+interface ProfilesAttrTypes extends Omit<TUploadIdentity, 'filePath'> {
   isPersonSuperUser: boolean;
   profilePath: string;
 }
@@ -41,24 +47,25 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
   const { user } = useAuth();
 
   const lovedArr = dataSource.loveCount;
-  const contents = dataSource.content.replace(newLineRegExp, "\n");
-  const isLongText = contents.split(" ").length > 75;
+  const contents = dataSource.content.replace(newLineRegExp, '\n');
+  const isLongText = contents.split(' ').length > 75;
 
-  const docsRef = doc(db, "feeds", dataSource.id);
+  const docsRef = doc(db, 'feeds', dataSource.id);
 
   const currentPath = usePathname();
-  const isRouteOnHomepage = currentPath === "/view/feeds";
+  const isRouteOnHomepage = currentPath === '/view/feeds';
 
   const [lovedTotal, setLovedTotal] = useState(lovedArr.length);
   const [isUserLoved, setIsUserLoved] = useState(false);
   const [profiles, setProfiles] = useState<ProfilesAttrTypes | null>(null);
 
-  const renderOverflowClasses = isRouteOnHomepage && isLongText ? "h-24 overflow-hidden" : "";
+  const renderOverflowClasses =
+    isRouteOnHomepage && isLongText ? 'h-24 overflow-hidden' : '';
 
   const getUserProfile = useCallback(async () => {
     try {
       const userDocument = dataSource.whoPosted.userRef;
-      const splitted: string[] = userDocument.trim().split("/");
+      const splitted: string[] = userDocument.trim().split('/');
       const documentRef = doc(db, splitted[1], splitted[2]);
       const response = await getDoc(documentRef);
 
@@ -79,18 +86,18 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
   }, []); // eslint-disable-line
 
   const putNewUserOnInterestField = useMutation({
-    mutationKey: "interactWithInterest",
+    mutationKey: 'interactWithInterest',
     mutationFn: async () => {
       if (isUserLoved) {
         updateDoc(docsRef, {
-          ["loveCount"]: arrayRemove(user.uid)
-        }).then(() => console.log("removed"));
+          ['loveCount']: arrayRemove(user.uid),
+        }).then(() => console.log('removed'));
       } else {
         updateDoc(docsRef, {
-          ["loveCount"]: arrayUnion(user.uid)
-        }).then(() => console.log("created"));
+          ['loveCount']: arrayUnion(user.uid),
+        }).then(() => console.log('created'));
       }
-    }
+    },
   });
 
   const handleUndoInterest = () => {
@@ -122,11 +129,8 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
   const showReadButtonProp = {
     id: dataSource.id,
     currentPath: currentPath,
-    lengthContent: contents.split(" ").length
+    lengthContent: contents.split(' ').length,
   };
-
-  const controlDisplayCard =
-    renderOverflowClasses + !isRouteOnHomepage ? "whitespace-pre-wrap" : "";
 
   return (
     <ParentCard className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 transition duration-300'>
@@ -138,7 +142,13 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className='text-sm relative'>
-        <article className={controlDisplayCard}>{contents}</article>
+        <article
+          className={`${renderOverflowClasses} ${
+            !isRouteOnHomepage && 'whitespace-pre-wrap'
+          }`}
+        >
+          {contents}
+        </article>
         <ShowNextReadButton {...showReadButtonProp} />
       </CardContent>
       <CardFooter>
@@ -166,10 +176,12 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
 
           <Link
             href={`/view/${dataSource.id}`}
-            className={withButton ? "block" : "hidden"}>
+            className={withButton ? 'block' : 'hidden'}
+          >
             <Button
               variant='default'
-              className='hover:bg-rose-600 flex gap-2 justify-center'>
+              className='hover:bg-rose-600 flex gap-2 justify-center'
+            >
               Detail
             </Button>
           </Link>
