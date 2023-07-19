@@ -1,19 +1,31 @@
-"use client";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  CardContent,
+} from '../ui/card'
+import { Skeleton } from '../ui/skeleton'
 
-import React from "react";
-import { Card, CardHeader, CardTitle, CardFooter, CardContent } from "../ui/card";
-import { Skeleton } from "../ui/skeleton";
-
-const SkeletonCard = () => {
-  const dummyCard = new Array(5).fill("");
-  const dummyParaghrapUnits = ["w-[85%]", "w-3/4", "w-80%", "w-[50%]"];
+const SkeletonCard = ({
+  direction,
+}: {
+  direction?: 'vertical' | 'horizontal'
+}) => {
+  const dummyCard = new Array(5).fill('')
+  const dummyParaghrapUnits = ['w-[85%]', 'w-3/4', 'w-80%', 'w-[50%]']
 
   return (
-    <React.Fragment>
+    <main
+      className={`pt-20 ${
+        direction === 'horizontal' ? 'px-10 gap-2 grid lg:grid-cols-3' : ''
+      }`}
+    >
       {dummyCard.map((item, index) => (
         <Card
           key={index + 1}
-          className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 transition duration-300'>
+          className='max-w-[720px] mx-auto w-full my-5 hover:bg-gray-900 transition duration-300'
+        >
           <CardHeader>
             <CardTitle>
               <Skeleton className='w-[120px] h-[10px] bg-zinc-700' />
@@ -39,8 +51,8 @@ const SkeletonCard = () => {
           </CardFooter>
         </Card>
       ))}
-    </React.Fragment>
-  );
-};
+    </main>
+  )
+}
 
-export default SkeletonCard;
+export default SkeletonCard

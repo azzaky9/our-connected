@@ -4,7 +4,7 @@ import Providers from './utils/Providers'
 import { Toaster } from '@/components/ui/toastutils/toaster'
 import { AuthProvider } from '@/context/AuthContext'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import Scrolltop from '@/components/Scrolltop'
+import Scrolltop from '@/components/Actionbutton/Scrolltop'
 
 const inter = Poppins({ weight: ['400', '600', '800'], subsets: ['latin'] })
 

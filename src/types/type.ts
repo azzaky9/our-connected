@@ -1,24 +1,24 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore'
 
 interface TUploadIdentity {
-  name: string;
-  username: string;
-  filePath: string;
+  name: string
+  username: string
+  filePath: string
 }
 
 interface TArgsUploadContent {
-  title: string;
-  content: string;
+  title: string
+  content: string
 }
 
 interface ObjectFieldTypes extends TArgsUploadContent {
-  id: string;
-  createdAt: Timestamp;
+  id: string
+  createdAt: Timestamp | string
   whoPosted: {
-    userRef: string;
-  };
-  likeCount: Array<string>;
-  loveCount: Array<string>;
+    userRef: string
+  }
+  likeCount: Array<string>
+  loveCount: Array<string>
 }
 
-export { type ObjectFieldTypes, type TUploadIdentity, type TArgsUploadContent };
+export { type ObjectFieldTypes, type TUploadIdentity, type TArgsUploadContent }
