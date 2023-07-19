@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Label } from '../ui/label';
+import { useState } from 'react'
+import { Label } from '../ui/label'
 import {
   Card,
   CardContent,
@@ -9,30 +9,30 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from '../ui/card';
-import { Textarea } from '../ui/textarea';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { useForm } from 'react-hook-form';
-import { useUpload } from '@/hooks/useUpload';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import useCustomToast from '@/hooks/useCustomToast';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+} from '../ui/card'
+import { Textarea } from '../ui/textarea'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { useForm } from 'react-hook-form'
+import { useUpload } from '@/hooks/index'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
+import useCustomToast from '@/hooks/useCustomToast'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface TCreateNewPostForm {
-  title: string;
-  content: string;
+  title: string
+  content: string
 }
 
 const NewPost = () => {
-  const { uploadContent } = useUpload();
-  const [inputValue, setInputValue] = useState('');
-  const { generateToast } = useCustomToast();
-  const maxWordCount = 1000;
-  const remainingWord = maxWordCount - inputValue.split(' ').length;
-  const { isLoading } = uploadContent;
-  const router = useRouter();
+  const { uploadContent } = useUpload()
+  const [inputValue, setInputValue] = useState('')
+  const { generateToast } = useCustomToast()
+  const maxWordCount = 1000
+  const remainingWord = maxWordCount - inputValue.split(' ').length
+  const { isLoading } = uploadContent
+  const router = useRouter()
 
   const {
     handleSubmit,
@@ -40,41 +40,41 @@ const NewPost = () => {
     clearErrors,
     resetField,
     formState: { errors },
-  } = useForm<TCreateNewPostForm>();
+  } = useForm<TCreateNewPostForm>()
 
   const onSubmit = (data: TCreateNewPostForm) => {
-    const { content, title } = data;
-    const { mutateAsync } = uploadContent;
+    const { content, title } = data
+    const { mutateAsync } = uploadContent
 
     mutateAsync({ content: content, title: title })
       .then(() => {
-        generateToast({ variant: 'success', message: 'successfully upload' });
-        resetField('content');
-        resetField('title');
-        router.push('/view/feeds');
+        generateToast({ variant: 'success', message: 'successfully upload' })
+        resetField('content')
+        resetField('title')
+        router.push('/view/feeds')
       })
       .catch((err) => {
         generateToast({
           variant: 'error',
           message: 'Ooop something went wrong',
-        });
-      });
-  };
+        })
+      })
+  }
 
   const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (remainingWord === 0 && e.target.value.length > inputValue.length) {
-      e.preventDefault(); // Prevent typing when remainder is zero
-      return;
+      e.preventDefault() // Prevent typing when remainder is zero
+      return
     }
 
-    setInputValue(e.target.value);
-  };
+    setInputValue(e.target.value)
+  }
 
   const renderErrorMessage = (
     <span className='text-[0.8rem] text-red-600'>
       This field must be required
     </span>
-  );
+  )
 
   return (
     <Card className='max-w-[468px] w-full bg-zinc-900'>
@@ -145,7 +145,7 @@ const NewPost = () => {
         </div>
       </CardFooter>
     </Card>
-  );
-};
+  )
+}
 
-export default NewPost;
+export default NewPost

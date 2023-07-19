@@ -26,7 +26,7 @@ const DisplayBlog = ({ id }: { id: string }) => {
     }) as ObjectFieldTypes[]
 
     const finalResult = resultSource.filter(
-      (doc) => doc.whoPosted.userRef === `/users/${id}`
+      (doc) => doc.postedBy.userRef === `/users/${id}`
     )
 
     return finalResult

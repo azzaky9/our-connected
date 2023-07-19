@@ -1,110 +1,108 @@
-"use client";
+'use client'
 
-import { Label } from "../ui/label";
-import { Pict } from "./index";
-import { useForm } from "react-hook-form";
-import { Button } from "../ui/button";
-import { useUpload } from "@/hooks/useUpload";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
-import { Resolver, FieldError } from "react-hook-form";
-import { Input } from "../ui/input";
+import { Label } from '../ui/label'
+import { Pict } from './index'
+import { useForm } from 'react-hook-form'
+import { Button } from '../ui/button'
+import { useUpload } from '@/hooks/index'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
+import { useAuth } from '@/context/AuthContext'
+import { useEffect } from 'react'
+import { Resolver, FieldError } from 'react-hook-form'
+import { Input } from '../ui/input'
 
 export type RegisteringAssetsType = {
-  username: string;
-  name: string;
-  file: File[];
-};
+  username: string
+  name: string
+  file: File[]
+}
 
 interface ErrorMessages {
-  file?: FieldError;
-  name?: FieldError;
-  username?: FieldError;
+  file?: FieldError
+  name?: FieldError
+  username?: FieldError
 }
 
 interface FormSettingProfilesProps {
-  onEdit: boolean;
-  closeEditModeHandler: () => void;
+  onEdit: boolean
+  closeEditModeHandler: () => void
 }
 
 // validate name not contain symbol and number
 const resolver: Resolver<RegisteringAssetsType> = async (data) => {
-  const nameValid = /^[a-z\s]+$/i.test(data.name);
-  const usernameValid = /^[a-z]+$/i.test(data.username);
-  const fileExtension = data.file[0]?.name.split(".").pop()?.toLowerCase();
-  const errors: ErrorMessages = {};
+  const nameValid = /^[a-z\s]+$/i.test(data.name)
+  const usernameValid = /^[a-z]+$/i.test(data.username)
+  const fileExtension = data.file[0]?.name.split('.').pop()?.toLowerCase()
+  const errors: ErrorMessages = {}
 
   if (!data.file[0]) {
-    errors.file = { type: "onChange", message: "Please select a file." };
-  } else if (!["webp", "jpeg", "jpg", "png"].includes(fileExtension || "")) {
+    errors.file = { type: 'onChange', message: 'Please select a file.' }
+  } else if (!['webp', 'jpeg', 'jpg', 'png'].includes(fileExtension || '')) {
     errors.file = {
-      type: "onChange",
+      type: 'onChange',
       message:
-        "Invalid file type. Please upload a file with the specified format. Only accept jpg, jpeg, png, and webp formats."
-    };
+        'Invalid file type. Please upload a file with the specified format. Only accept jpg, jpeg, png, and webp formats.',
+    }
   }
 
   if (!nameValid) {
     errors.name = {
-      type: "onChange",
-      message: "Name should not contain symbols or numbers."
-    };
+      type: 'onChange',
+      message: 'Name should not contain symbols or numbers.',
+    }
   }
 
   if (!usernameValid) {
     errors.username = {
-      type: "onChange",
-      message: "Username only accepts lowercase letters."
-    };
+      type: 'onChange',
+      message: 'Username only accepts lowercase letters.',
+    }
   }
 
-  return { values: data, errors };
-};
+  return { values: data, errors }
+}
 
 const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
   onEdit,
-  closeEditModeHandler
+  closeEditModeHandler,
 }) => {
-  const { uploadProfile } = useUpload();
+  const { uploadProfile } = useUpload()
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
-  } = useForm<RegisteringAssetsType>({ resolver });
+    reset,
+  } = useForm<RegisteringAssetsType>({ resolver })
 
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   useEffect(() => {
     if (!onEdit) {
-      return reset();
+      return reset()
     }
-  }, [onEdit, reset]);
+  }, [onEdit, reset])
 
   const onSubmit = handleSubmit((data) => {
-    const { mutate } = uploadProfile;
+    const { mutate } = uploadProfile
 
-    mutate({ ...data, closeEditModeHandler, reset });
-  });
+    mutate({ ...data, closeEditModeHandler, reset })
+  })
 
   const ErrMessage = ({ msg }: { msg?: string }) => (
     <li className='text-[0.7rem] text-red-700 list-disc'>{msg}</li>
-  );
+  )
 
-  const showEditMode = onEdit ? "grid" : "hidden";
+  const showEditMode = onEdit ? 'grid' : 'hidden'
 
   return (
-    <form
-      className='grid gap-4'
-      onSubmit={onSubmit}>
+    <form className='grid gap-4' onSubmit={onSubmit}>
       <div className='grid grid-cols-4'>
         <Pict size='medium' />
         {onEdit ? (
           <Input
             type='file'
             className='col-span-3 input-styles'
-            {...register("file", { required: "file must required" })}
+            {...register('file', { required: 'file must required' })}
           />
         ) : (
           <div className='col-span-3'>
@@ -122,7 +120,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
           type='text'
           className='input-styles'
           placeholder='new username'
-          {...register("username", { required: "username must be required" })}
+          {...register('username', { required: 'username must be required' })}
         />
       </div>
       <div className={showEditMode}>
@@ -135,17 +133,18 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
           autoComplete='off'
           className='input-styles'
           placeholder='new name'
-          {...register("name", { required: "name must be required" })}
+          {...register('name', { required: 'name must be required' })}
         />
       </div>
       <Button
         disabled={uploadProfile.isLoading}
         className={showEditMode}
-        type='submit'>
+        type='submit'
+      >
         {uploadProfile.isLoading ? (
           <AiOutlineLoading3Quarters className='animate-spin' />
         ) : (
-          "Save changes"
+          'Save changes'
         )}
       </Button>
       <ul>
@@ -154,7 +153,7 @@ const FormSettingProfiles: React.FC<FormSettingProfilesProps> = ({
         {errors.username && <ErrMessage msg={errors.username?.message} />}
       </ul>
     </form>
-  );
-};
+  )
+}
 
-export default FormSettingProfiles;
+export default FormSettingProfiles
