@@ -1,4 +1,4 @@
-import DisplayBlog from './DisplayBlog'
+import DisplayUserBlog from './DisplayUserBlog'
 
 // const getOwnPost = async (id: string) => {
 //   const q = collection(db, 'feeds')
@@ -20,7 +20,7 @@ import DisplayBlog from './DisplayBlog'
 const page = ({ params }: { params: { uid: string } }) => {
   return (
     <main>
-      <DisplayBlog id={params.uid} />
+      <DisplayUserBlog userId={params.uid} />
     </main>
   )
 }

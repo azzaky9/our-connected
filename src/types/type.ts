@@ -14,9 +14,8 @@ interface TArgsUploadContent {
 interface ObjectFieldTypes extends TArgsUploadContent {
   id: string
   createdAt: Timestamp | string
-  postedBy: {
-    userRef: string
-  }
+  postedBy: string
+  likeBlog: Array<string>
 }
 
 export { type ObjectFieldTypes, type TUploadIdentity, type TArgsUploadContent }

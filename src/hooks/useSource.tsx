@@ -1,18 +1,32 @@
 'use client'
 
-import { Query, doc, getDocs, getDoc, DocumentData } from 'firebase/firestore'
+import {
+  Query,
+  doc,
+  getDocs,
+  getDoc,
+  DocumentData,
+  collection,
+  orderBy,
+  query,
+  where,
+  QuerySnapshot,
+} from 'firebase/firestore'
 import { ObjectFieldTypes } from '@/types/type'
+import { useQuery } from 'react-query'
 import { fireStore as db, fireStore } from '@/firebase/config'
-import { DocumentTypesUsers } from '@/context/AuthContext'
+import { DocumentTypesUsers, useAuth } from '@/context/AuthContext'
 import { FirebaseError } from 'firebase/app'
 
 type LikeArrayTypes = { totalLike: Array<string> }
 
-const useSource = () => {
-  const getMainSource = async (queryOption: Query<DocumentData>) => {
-    const querySnapshot = await getDocs(queryOption)
+export interface TFeedsDataQuery extends Omit<ObjectFieldTypes, 'postedBy'> {
+  postedBy: DocumentTypesUsers
+}
 
-    const resultSource = querySnapshot.docs.map((doc) => {
+const useSource = () => {
+  const convertDates = (docSnapshot: QuerySnapshot<DocumentData>) => {
+    const resultSource = docSnapshot.docs.map((doc) => {
       const data = doc.data()
 
       return {
@@ -24,25 +38,31 @@ const useSource = () => {
     return resultSource
   }
 
-  const getProfileFromRef = async (reference: string) => {
-    try {
-      const splitted: string[] = reference.trim().split('/')
-      const documentRef = doc(db, splitted[1], splitted[2])
-      const response = await getDoc(documentRef)
+  const getMainSource = async () => {
+    const collectionRef = collection(db, 'feeds')
+    const q = query(collectionRef, orderBy('createdAt', 'desc'))
+    const querySnapshot = await getDocs(q)
 
-      if (response.exists()) {
-        const result = response.data() as DocumentTypesUsers
+    const result = convertDates(querySnapshot)
 
-        return result
-      }
-    } catch (error) {
-      if (error instanceof FirebaseError) return error.message
-    }
+    return result
+  }
+
+  const getOwnBlogs = async (uid: string) => {
+    const blogRf = collection(fireStore, 'feeds')
+
+    const q = query(blogRf, where('postedBy', '==', uid))
+
+    const querySnapshot = await getDocs(q)
+
+    const result = convertDates(querySnapshot)
+
+    return result
   }
 
   const getlikeBlog = async (blogId: string) => {
     try {
-      const likeCollection = doc(fireStore, 'like', blogId)
+      const likeCollection = doc(db, 'like', blogId)
 
       const docSnapshot = await getDoc(likeCollection)
 
@@ -52,7 +72,7 @@ const useSource = () => {
     }
   }
 
-  return { getProfileFromRef, getMainSource, getlikeBlog }
+  return { getMainSource, getlikeBlog, getOwnBlogs }
 }
 
 export default useSource

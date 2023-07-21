@@ -1,95 +1,69 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Heart } from 'lucide-react'
-import { useAuth } from '@/context/AuthContext'
 import { useSource } from '@/hooks'
-import { useQuery, useMutation } from 'react-query'
+import { useQuery } from 'react-query'
 import {
   updateDoc,
   arrayRemove,
   arrayUnion,
   doc,
-  onSnapshot,
   collection,
+  onSnapshot,
 } from 'firebase/firestore'
 import { fireStore as db } from '@/firebase/config'
+import { ObjectFieldTypes } from '@/types/type'
+import { DocumentTypesUsers } from '@/context/AuthContext'
 
-const LoveButton = ({
-  blogId,
-  uid,
-}: {
+type LikeField = Pick<ObjectFieldTypes, 'likeBlog'>
+
+interface TPropsLoveButton extends LikeField {
+  uid: string
   blogId: string
-  uid: string | null
-}) => {
-  // const { user } = useAuth()
-  const { getlikeBlog } = useSource()
+}
 
+const LoveButton: React.FC<TPropsLoveButton> = ({ likeBlog, uid, blogId }) => {
   const [userInField, setUserInField] = useState(false)
+  const [likeCount, setLikeCount] = useState(likeBlog.length)
+  const [isChecking, setIsChecking] = useState(false)
 
   const isUserPropNull = uid === null
 
-  const { mutate } = useMutation({
-    mutationKey: 'interactWithInterest',
-    mutationFn: async () => {
-      const docsRef = doc(db, 'like', blogId)
+  const docsRef = doc(db, 'feeds', blogId)
 
-      if (userInField) {
-        await updateDoc(docsRef, {
-          totalLike: arrayRemove(uid),
-        }).then(() => console.log('removed'))
-      } else {
-        await updateDoc(docsRef, {
-          totalLike: arrayUnion(`${uid}`),
-        }).then(() => console.log('created'))
-      }
-    },
-  })
-
-  const findUserExistInArray = (s: Array<string>) => {
-    const finding = s.find((id) => id === uid)
-    // setIsUserLoved(Boolean(finding))
+  const findUserExistInArray = useCallback(() => {
+    setIsChecking(true)
+    const finding = likeBlog.find((person) => person === uid)
 
     setUserInField(Boolean(finding))
-  }
 
-  const { data, isError, isLoading, refetch } = useQuery('likeBlog', {
-    queryFn: async () => {
-      const likeBlog = await getlikeBlog(blogId)
-
-      const isRetrieveValid = likeBlog && typeof likeBlog !== 'string'
-
-      if (isRetrieveValid) findUserExistInArray(likeBlog.totalLike)
-
-      return isRetrieveValid ? likeBlog.totalLike : null
-    },
-  })
-
-  const handleLike = () => mutate()
-
-  const handleUnlike = () => mutate()
+    setIsChecking(false)
+  }, [likeBlog, uid])
 
   useEffect(() => {
-    // Firestore collection reference
-    const collectionRef = collection(db, 'like')
+    findUserExistInArray()
+  }, [findUserExistInArray])
 
-    // Subscribe to real-time updates
-    const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        switch (change.type) {
-          case 'added':
-            return refetch()
-          case 'removed':
-            return refetch()
-        }
-      })
+  const handleLike = async () => {
+    setUserInField(true)
+    setLikeCount(likeCount + 1)
+
+    await updateDoc(docsRef, {
+      likeBlog: arrayUnion(uid),
     })
+  }
 
-    // Clean up the listener when the component unmounts
-    return () => unsubscribe()
-  }, [refetch])
+  const handleUnlike = async () => {
+    setUserInField(false)
+    setLikeCount(likeCount - 1)
 
-  if (isLoading) <p>Loading...</p>
+    await updateDoc(docsRef, {
+      likeBlog: arrayRemove(uid),
+    })
+  }
+
+  if (isChecking) return <span className='text-lg'>...</span>
 
   return (
     <span
@@ -107,10 +81,10 @@ const LoveButton = ({
         <Heart
           color='#3f3f46'
           onClick={handleLike}
-          className={`text-xl fill-transparent transition duration-75 cursor-pointer`}
+          className='text-xl fill-transparent transition duration-75 cursor-pointer'
         />
       )}
-      {data?.length}
+      {likeCount}
     </span>
   )
 }

@@ -1,10 +1,11 @@
 import './globals.css'
 import { Poppins } from 'next/font/google'
-import Providers from './utils/Providers'
+import Providers from '@/utils/Providers'
 import { Toaster } from '@/components/ui/toastutils/toaster'
 import { AuthProvider } from '@/context/AuthContext'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Scrolltop from '@/components/Actionbutton/Scrolltop'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const inter = Poppins({ weight: ['400', '600', '800'], subsets: ['latin'] })
 
@@ -31,6 +32,7 @@ export default function RootLayout({
               <Toaster />
             </TooltipProvider>
           </AuthProvider>
+          {/* <ReactQueryDevtools initialIsOpen={true} /> */}
         </Providers>
       </body>
     </html>

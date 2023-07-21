@@ -3,6 +3,7 @@
 import React from 'react'
 import { ObjectFieldTypes } from '@/types/type'
 import Card from './Card'
+import { TFeedsDataQuery } from '@/hooks/useSource'
 
 interface TCardCollection {
   source: ObjectFieldTypes[]

@@ -16,7 +16,7 @@ const SkeletonCard = ({
   const dummyParaghrapUnits = ['w-[85%]', 'w-3/4', 'w-80%', 'w-[50%]']
 
   return (
-    <main
+    <div
       className={`pt-20 ${
         direction === 'horizontal' ? 'px-10 gap-2 grid lg:grid-cols-3' : ''
       }`}
@@ -51,7 +51,7 @@ const SkeletonCard = ({
           </CardFooter>
         </Card>
       ))}
-    </main>
+    </div>
   )
 }
 

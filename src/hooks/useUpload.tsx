@@ -153,9 +153,8 @@ const useUpload = () => {
           title: title,
           content: replaceNewLine,
           createdAt: Timestamp.now(),
-          postedBy: {
-            userRef: `/users/${user.uid}`,
-          },
+          postedBy: user.uid,
+          likeBlog: arrayUnion(),
         }
 
         await setDoc(feedsCollectionRef, contentsField)
