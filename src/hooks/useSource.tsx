@@ -38,16 +38,6 @@ const useSource = () => {
     return resultSource
   }
 
-  const getMainSource = async () => {
-    const collectionRef = collection(db, 'feeds')
-    const q = query(collectionRef, orderBy('createdAt', 'desc'))
-    const querySnapshot = await getDocs(q)
-
-    const result = convertDates(querySnapshot)
-
-    return result
-  }
-
   const getOwnBlogs = async (uid: string) => {
     const blogRf = collection(fireStore, 'feeds')
 
@@ -72,7 +62,7 @@ const useSource = () => {
     }
   }
 
-  return { getMainSource, getlikeBlog, getOwnBlogs }
+  return { getlikeBlog, getOwnBlogs }
 }
 
 export default useSource

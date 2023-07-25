@@ -10,9 +10,18 @@ import Card from '../FeedsUi/Card'
 const getSpecificBlog = async (id: string) => {
   const docRef = doc(fireStore, 'feeds', id)
   const docSnapshot = await getDoc(docRef)
-  const data = docSnapshot.data() as ObjectFieldTypes
+  const data = [docSnapshot.data()] as ObjectFieldTypes[]
 
-  return data
+  const result = data.map((d) => {
+    if (typeof d.createdAt !== 'string') {
+      return {
+        ...d,
+        createdAt: d.createdAt.toDate().toLocaleDateString(),
+      }
+    }
+  })
+
+  return result[0]
 }
 
 const GetSpecificBlog = ({ blogId }: { blogId: string }) => {

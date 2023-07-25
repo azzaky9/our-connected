@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toastutils/toaster'
 import { AuthProvider } from '@/context/AuthContext'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Scrolltop from '@/components/Actionbutton/Scrolltop'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { BlogsProvider } from '@/context/BlogsContext'
 
 const inter = Poppins({ weight: ['400', '600', '800'], subsets: ['latin'] })
 
@@ -26,11 +26,13 @@ export default function RootLayout({
       >
         <Providers>
           <AuthProvider>
-            <TooltipProvider>
-              <Scrolltop />
-              {children}
-              <Toaster />
-            </TooltipProvider>
+            <BlogsProvider>
+              <TooltipProvider>
+                <Scrolltop />
+                {children}
+                <Toaster />
+              </TooltipProvider>
+            </BlogsProvider>
           </AuthProvider>
           {/* <ReactQueryDevtools initialIsOpen={true} /> */}
         </Providers>

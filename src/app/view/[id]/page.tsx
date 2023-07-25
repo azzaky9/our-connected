@@ -2,9 +2,9 @@ import GetSpecificBlog from '@/components/Actionbutton/GetSpecificBlog'
 
 const page = ({ params }: { params: { id: string } }) => {
   return (
-    <div className='h-screen'>
+    <main className='min-h-screen h-fit'>
       <GetSpecificBlog blogId={params.id} />
-    </div>
+    </main>
   )
 }
 

@@ -1,22 +1,7 @@
 'use client'
 
-import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
-import { Sparkles } from 'lucide-react'
 import { ObjectFieldTypes } from '@/types/type'
 import Link from 'next/link'
-
-const SuperUserStars = () => {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Sparkles className='cursor-pointer' size='14px' color='#eeff1d' />
-      </TooltipTrigger>
-      <TooltipContent className='bg-zinc-900 border-zinc-900 text-white'>
-        This user indicating Super User
-      </TooltipContent>
-    </Tooltip>
-  )
-}
 
 interface TPropShowNextReadButton extends Pick<ObjectFieldTypes, 'id'> {
   currentPath: string
@@ -48,4 +33,4 @@ const ShowNextReadButton: React.FC<TPropShowNextReadButton> = ({
   )
 }
 
-export { SuperUserStars, ShowNextReadButton }
+export { ShowNextReadButton }

@@ -1,48 +1,37 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState, useMemo, memo } from 'react'
 
 import CardCollection from '@/components/FeedsUi/CardCollection'
 import DisplayEmptyPost from '@/components/DisplayEmptyPost'
 import SkeletonCard from '@/components/FeedsUi/SkeletonCard'
-import { useSource } from '@/hooks'
-import { useAuth } from '@/context/AuthContext'
-import { useQuery } from 'react-query'
+import { useBlogs } from '@/context/BlogsContext'
 
-const DisplayUserBlog = ({ userId }: { userId: string }) => {
-  const { getOwnBlogs } = useSource()
+const DisplayUserBlog = memo(({ userId }: { userId: string }) => {
+  const { queryOption } = useBlogs()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['ownBlogs', userId],
-    queryFn: () => getOwnBlogs(userId),
-  })
+  const filterBlogs = useMemo(() => {
+    setIsLoading(true)
 
-  // useEffect(() => {
-  //   // Firestore collection reference
-  //   const collectionRef = collection(db, 'feeds')
+    const result = queryOption.data?.filter((d) => d.postedBy === userId)
 
-  //   // Subscribe to real-time updates
-  //   const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
-  //     snapshot.docChanges().forEach((change) => {
-  //       switch (change.type) {
-  //         case 'removed':
-  //           return refetch()
-  //       }
-  //     })
-  //   })
+    setIsLoading(false)
 
-  // Clean up the listener when the component unmounts
-  //   return () => unsubscribe()
-  // }, [refetch])
+    if (result) return result
+    else return null
+  }, [queryOption.data, userId])
 
-  if (isLoading) return <SkeletonCard />
+  const data = filterBlogs
+
+  if (isLoading || queryOption.isRefetching) return <SkeletonCard />
 
   return (
     <React.Fragment>
       {data ? (
         <div className='px-10 pt-20 grid '>
-          {data && data.length > 0 ? (
-            <CardCollection source={data} />
+          {data.length > 0 ? (
+            <CardCollection source={filterBlogs} />
           ) : (
             <DisplayEmptyPost />
           )}
@@ -50,6 +39,8 @@ const DisplayUserBlog = ({ userId }: { userId: string }) => {
       ) : null}
     </React.Fragment>
   )
-}
+})
+
+DisplayUserBlog.displayName = 'DisplayUserBlog'
 
 export default DisplayUserBlog

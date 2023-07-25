@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'
 import { MoreVertical } from 'lucide-react'
 import { Button } from '../ui/button'
@@ -17,16 +17,24 @@ import {
 import { FirebaseError } from 'firebase/app'
 import { useMutation } from 'react-query'
 import { LoaderIcon } from 'lucide-react'
+import { useBlogs } from '@/context/BlogsContext'
 
 const DeleteBlog = ({ blogId }: { blogId: string }) => {
+  const { queryOption } = useBlogs()
+  const [dialogOpen, setDialogOpen] = useState(false)
+
   const { mutate, isLoading } = useMutation({
     mutationKey: 'deleteBlog',
     mutationFn: async () => {
       try {
         const documentRef = doc(fireStore, 'feeds', blogId)
         await deleteDoc(documentRef)
+
+        queryOption.refetch()
+
+        setDialogOpen(false)
       } catch (error) {
-        return error instanceof FirebaseError ? error.message : undefined
+        if (error instanceof FirebaseError) console.log(error.message)
       }
     },
   })
@@ -34,10 +42,10 @@ const DeleteBlog = ({ blogId }: { blogId: string }) => {
   const handleDelete = () => mutate()
 
   return (
-    <Dialog>
+    <Dialog defaultOpen={dialogOpen}>
       <Popover>
         <PopoverTrigger className='hover:cursor-pointer' asChild>
-          <span className='px-[2px] hover:bg-gray-500 rounded-full'>
+          <span className='h-fit transition duration-300 hover:bg-zinc-400 active:bg-zinc-700 rounded-full'>
             <MoreVertical size='18px' className='my-1' />
           </span>
         </PopoverTrigger>

@@ -4,18 +4,14 @@ import { useSource } from '@/hooks'
 import { useQuery } from 'react-query'
 import CardCollection from '@/components/FeedsUi/CardCollection'
 import SkeletonCard from '@/components/FeedsUi/SkeletonCard'
+import { useBlogs } from '@/context/BlogsContext'
 
 const DisplayFeeds = () => {
-  const { getMainSource } = useSource()
+  const { queryOption } = useBlogs()
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['feeds'],
-    queryFn: getMainSource,
-  })
+  if (queryOption.isLoading) return <SkeletonCard />
 
-  if (isLoading) return <SkeletonCard />
-
-  return data ? <CardCollection source={data} /> : null
+  return queryOption.data ? <CardCollection source={queryOption.data} /> : null
 }
 
 export default DisplayFeeds

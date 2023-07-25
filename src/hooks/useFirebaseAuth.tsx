@@ -54,6 +54,7 @@ const useFirebaseAuth = () => {
   }
 
   const loginUser = useMutation({
+    mutationKey: ['defaultLogin'],
     mutationFn: async ({ email, password }: LoginValuesInput) => {
       try {
         const { user } = await signInWithEmailAndPassword(auth, email, password)
@@ -92,6 +93,7 @@ const useFirebaseAuth = () => {
   })
 
   const createNewUser = useMutation({
+    mutationKey: ['createNewAcc'],
     mutationFn: async ({
       email,
       password,
@@ -128,6 +130,7 @@ const useFirebaseAuth = () => {
   })
 
   const signinWithGoogleAuth = useMutation({
+    mutationKey: ['loginGoogleProvider'],
     mutationFn: async () => {
       try {
         const { user } = await signInWithPopup(auth, provider)
@@ -160,11 +163,10 @@ const useFirebaseAuth = () => {
   })
 
   const mutationSignOut = useMutation({
+    mutationKey: ['logout'],
     mutationFn: async () => {
       return signOut(auth)
         .then(() => {
-          router.push('/register/signin')
-          generateToast({ variant: 'success', message: 'Succes Log Out' })
           clearUser()
         })
         .catch((err) => {

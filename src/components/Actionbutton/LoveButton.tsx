@@ -2,88 +2,139 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Heart } from 'lucide-react'
-import { useSource } from '@/hooks'
-import { useQuery } from 'react-query'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import {
   updateDoc,
   arrayRemove,
   arrayUnion,
   doc,
   collection,
+  query,
   onSnapshot,
 } from 'firebase/firestore'
 import { fireStore as db } from '@/firebase/config'
 import { ObjectFieldTypes } from '@/types/type'
-import { DocumentTypesUsers } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
+import { useBlogs } from '@/context/BlogsContext'
+import { Button } from '../ui/button'
 
 type LikeField = Pick<ObjectFieldTypes, 'likeBlog'>
 
 interface TPropsLoveButton extends LikeField {
-  uid: string
+  uid: string | null
   blogId: string
 }
 
-const LoveButton: React.FC<TPropsLoveButton> = ({ likeBlog, uid, blogId }) => {
-  const [userInField, setUserInField] = useState(false)
-  const [likeCount, setLikeCount] = useState(likeBlog.length)
-  const [isChecking, setIsChecking] = useState(false)
+const NotifiedForLogin = () => {
+  const { push } = useRouter()
 
-  const isUserPropNull = uid === null
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Heart
+          color='#3f3f46'
+          className='text-xl fill-transparent transition duration-75 cursor-pointer'
+        />
+      </AlertDialogTrigger>
+      <AlertDialogContent className='bg-slate-950 border-slate-700'>
+        <AlertDialogHeader>
+          <AlertDialogTitle className='text-white'>
+            Not authorize for access this app
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Plase login with your own account, we provide some login access for
+            Authenticate
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className='bg-white hover:bg-white/60'>
+            Stay Without Login
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={() => push('/register/signin')}>
+            Continue
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+const LoveButton: React.FC<TPropsLoveButton> = ({ likeBlog, uid, blogId }) => {
+  const { queryOption } = useBlogs()
+  const { refetch } = queryOption
+  const [likeCount, setLikeCount] = useState(likeBlog.length)
+  const [isExistInsideField, setExistInsideField] = useState(false)
+  const [isMountToServer, setIsMountToServer] = useState(false)
 
   const docsRef = doc(db, 'feeds', blogId)
 
-  const findUserExistInArray = useCallback(() => {
-    setIsChecking(true)
-    const finding = likeBlog.find((person) => person === uid)
+  useEffect(() => {
+    const findUserExistInArray = () => {
+      const finding = likeBlog.find((person) => person === uid)
 
-    setUserInField(Boolean(finding))
+      setExistInsideField(Boolean(finding))
+    }
 
-    setIsChecking(false)
+    findUserExistInArray()
   }, [likeBlog, uid])
 
-  useEffect(() => {
-    findUserExistInArray()
-  }, [findUserExistInArray])
-
   const handleLike = async () => {
-    setUserInField(true)
-    setLikeCount(likeCount + 1)
+    setIsMountToServer(true)
 
-    await updateDoc(docsRef, {
-      likeBlog: arrayUnion(uid),
-    })
+    if (isExistInsideField) {
+      setIsMountToServer(true)
+
+      setLikeCount(likeCount - 1)
+      setExistInsideField(false)
+      await updateDoc(docsRef, {
+        likeBlog: arrayRemove(uid),
+      }).then(() => setIsMountToServer(false))
+    } else {
+      setLikeCount(likeCount + 1)
+      setExistInsideField(true)
+      await updateDoc(docsRef, {
+        likeBlog: arrayUnion(uid),
+      }).then(() => setIsMountToServer(false))
+    }
   }
 
-  const handleUnlike = async () => {
-    setUserInField(false)
-    setLikeCount(likeCount - 1)
+  if (uid === null) {
+    return (
+      <span className='flex gap-2 items-center select-none'>
+        <NotifiedForLogin />
 
-    await updateDoc(docsRef, {
-      likeBlog: arrayRemove(uid),
-    })
+        {likeCount}
+      </span>
+    )
   }
-
-  if (isChecking) return <span className='text-lg'>...</span>
 
   return (
-    <span
-      className={`${
-        isUserPropNull ? 'hidden' : 'flex'
-      } gap-2 items-center select-none`}
-    >
-      {userInField ? (
+    <span className='flex gap-1 items-center select-none'>
+      <Button
+        size='icon'
+        disabled={isMountToServer}
+        className={`bg-transparent hover:bg-transparent${
+          isMountToServer ? 'hover:cursor-not-allowed' : 'cursor-pointer'
+        }`}
+      >
         <Heart
-          color='rgb(225, 29, 72)'
-          onClick={handleUnlike}
-          className='text-xl fill-rose-600 transition duration-150 scale-110 cursor-pointer'
-        />
-      ) : (
-        <Heart
-          color='#3f3f46'
+          color={isExistInsideField ? 'rgb(225, 29, 72)' : '#3f3f46'}
           onClick={handleLike}
-          className='text-xl fill-transparent transition duration-75 cursor-pointer'
+          className={`text-xl ${
+            isExistInsideField ? 'fill-rose-600' : ''
+          }  transition-transform duration-1000 active:scale-90 `}
         />
-      )}
+      </Button>
       {likeCount}
     </span>
   )
