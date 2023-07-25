@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { ObjectFieldTypes } from '@/types/type'
 import { useQuery, UseQueryResult } from 'react-query'
 import {
@@ -10,9 +10,9 @@ import {
   getDocs,
   QuerySnapshot,
   DocumentData,
+  onSnapshot,
 } from 'firebase/firestore'
 import { fireStore as db } from '@/firebase/config'
-import { useAuth } from './AuthContext'
 
 interface TContextValue {
   queryOption: UseQueryResult<ObjectFieldTypes[], unknown>
@@ -55,6 +55,7 @@ const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
   const blogsQuery = useQuery({
     queryKey: ['feeds'],
     queryFn: getMainSource,
+    staleTime: Infinity,
   })
 
   return (

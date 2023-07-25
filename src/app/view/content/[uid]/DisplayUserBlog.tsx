@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useMemo, memo } from 'react'
+import React, { useState, useMemo, memo } from 'react'
 
 import CardCollection from '@/components/FeedsUi/CardCollection'
 import DisplayEmptyPost from '@/components/DisplayEmptyPost'

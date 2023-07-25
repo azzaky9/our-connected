@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { type ObjectFieldTypes } from '@/types/type'
 import {
