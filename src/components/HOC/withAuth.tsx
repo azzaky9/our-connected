@@ -1,31 +1,36 @@
-"use client";
+'use client'
 
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useAuth } from '@/context/AuthContext'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 
 const withAuth = <P extends object>(Component: React.FC<P>) => {
   const ValidateAuthComponent: React.FC<P> = (props) => {
-    const router = useRouter();
-    const { user } = useAuth();
+    const router = useRouter()
+    const path = usePathname()
+    const { user, isGettingUserData } = useAuth()
 
     useEffect(() => {
-      if (!user.email) router.push("/register/signin");
-    }, [user, router]);
+      if (user.uid && !isGettingUserData && path === '/') {
+        return router.push('/view/feeds')
+      } else if (path !== '/register/signup' && !user.uid) {
+        return router.push('/register/signin')
+      }
+    }, [user, router, isGettingUserData, path])
 
-    if (!user.email) {
+    if (!user.uid) {
       return (
         <div className='h-screen w-full grid place-content-center'>
           <AiOutlineLoading3Quarters className='text-2xl animate-spin text-slate-400' />
         </div>
-      );
+      )
     }
 
-    return <Component {...props} />;
-  };
+    return <Component {...props} />
+  }
 
-  return ValidateAuthComponent;
-};
+  return ValidateAuthComponent
+}
 
-export default withAuth;
+export default withAuth

@@ -75,14 +75,14 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
           {renderCopiedIcons}
           {renderDeleteOption}
         </CardTitle>
-        <CardDescription className='text-sm flex gap-2'>
+        <div className='text-sm flex gap-2 py-2'>
           {profilePosted ? (
             <Username
               isPersonSuperUser={profilePosted.isPersonSuperUser}
               username={profilePosted.username}
             />
           ) : null}
-        </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className='text-sm relative'>
         <ExpandCtnt {...expandComponentProps} />

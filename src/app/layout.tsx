@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${inter.className} min-h-screen h-fit bg-gradient-to-br  from-zinc-900 to-slate-950 `}
+        className={`${inter.className} min-h-screen h-fit bg-gradient-to-br  from-zinc-950 to-slate-950 `}
       >
         <Providers>
           <AuthProvider>

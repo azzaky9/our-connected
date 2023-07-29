@@ -29,7 +29,7 @@ const DisplayUserBlog = memo(({ userId }: { userId: string }) => {
   return (
     <React.Fragment>
       {data ? (
-        <div className='px-10 pt-20 grid '>
+        <div className='pt-20'>
           {data.length > 0 ? (
             <CardCollection source={filterBlogs} />
           ) : (

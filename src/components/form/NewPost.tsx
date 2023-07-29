@@ -16,8 +16,10 @@ import { Button } from '../ui/button'
 import { useForm } from 'react-hook-form'
 import { useUpload } from '@/hooks/index'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
-import useCustomToast from '@/hooks/useCustomToast'
 import { useRouter } from 'next/navigation'
+import { useBlogs } from '@/context/BlogsContext'
+import withAuth from '../HOC/withAuth'
+import useCustomToast from '@/hooks/useCustomToast'
 import Link from 'next/link'
 
 interface TCreateNewPostForm {
@@ -29,9 +31,10 @@ const NewPost = () => {
   const { uploadContent } = useUpload()
   const [inputValue, setInputValue] = useState('')
   const { generateToast } = useCustomToast()
+  const { isLoading } = uploadContent
+  const { queryOption } = useBlogs()
   const maxWordCount = 1000
   const remainingWord = maxWordCount - inputValue.split(' ').length
-  const { isLoading } = uploadContent
   const router = useRouter()
 
   const {
@@ -43,13 +46,13 @@ const NewPost = () => {
   } = useForm<TCreateNewPostForm>()
 
   const onSubmit = (data: TCreateNewPostForm) => {
-    const { content, title } = data
     const { mutateAsync } = uploadContent
 
-    mutateAsync({ content: content, title: title })
+    mutateAsync(data)
       .then(() => {
         generateToast({ variant: 'success', message: 'successfully upload' })
         resetField('content')
+        queryOption.refetch()
         resetField('title')
         router.push('/view/feeds')
       })
@@ -148,4 +151,4 @@ const NewPost = () => {
   )
 }
 
-export default NewPost
+export default withAuth(NewPost)

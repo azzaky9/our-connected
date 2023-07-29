@@ -66,7 +66,11 @@ const DeleteBlog = ({ blogId }: { blogId: string }) => {
         </DialogHeader>
         <DialogFooter>
           <Button onClick={handleDelete} disabled={isLoading}>
-            {isLoading ? <LoaderIcon /> : 'Yes i want to delete it'}
+            {isLoading ? (
+              <LoaderIcon className='animate-spin' />
+            ) : (
+              'Yes i want to delete it'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

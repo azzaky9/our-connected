@@ -1,17 +1,20 @@
 'use client'
 
-import { useSource } from '@/hooks'
-import { useQuery } from 'react-query'
 import CardCollection from '@/components/FeedsUi/CardCollection'
 import SkeletonCard from '@/components/FeedsUi/SkeletonCard'
 import { useBlogs } from '@/context/BlogsContext'
 
 const DisplayFeeds = () => {
   const { queryOption } = useBlogs()
+  const { isRefetching, isLoading } = queryOption
 
-  if (queryOption.isLoading) return <SkeletonCard />
+  if (isRefetching || isLoading) return <SkeletonCard />
 
-  return queryOption.data ? <CardCollection source={queryOption.data} /> : null
+  return (
+    <div className='pt-20'>
+      {queryOption.data ? <CardCollection source={queryOption.data} /> : null}
+    </div>
+  )
 }
 
 export default DisplayFeeds

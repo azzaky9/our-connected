@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage'
 import { storage, fireStore } from '@/firebase/config'
@@ -21,18 +22,22 @@ import { RegisteringAssetsType } from '@/components/Navbar/FormSettingProfiles'
 import { UseFormReset } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import { TArgsUploadContent, TUploadIdentity } from '@/types/type'
-import useFirebaseAuth from './useFirebaseAuth'
+import FileResizer from 'react-image-file-resizer'
 
-interface ArgumentClosedHandler extends RegisteringAssetsType {
+interface ArgumentClosedHandler extends Omit<RegisteringAssetsType, 'file'> {
   closeEditModeHandler: () => void
   reset: UseFormReset<RegisteringAssetsType>
+  file: File
 }
 
 const useUpload = () => {
+  // const [crop, setCrop] = useState<Crop>({ , unit: "px" })
   const { user, updateDispatchState } = useAuth()
   const { generateToast } = useCustomToast()
+  const { imageFileResizer } = FileResizer
+  const [fileCompress, setFileCompress] = useState<File | Blob | string>()
 
-  const checkUsernameAvailability = async (username: string) => {
+  const usernameAvailabe = async (username: string) => {
     try {
       const usersCollectionRef = collection(fireStore, 'users')
       const q = query(usersCollectionRef, where('username', '==', username))
@@ -45,7 +50,23 @@ const useUpload = () => {
     }
   }
 
+  const compressFile = (file: Blob) => {
+    return new Promise((resolve, reject) => {
+      imageFileResizer(
+        file,
+        300,
+        300,
+        'JPEG',
+        100,
+        0,
+        (resized) => resolve(resized),
+        'file'
+      )
+    })
+  }
+
   const updateProfile = useMutation({
+    mutationKey: ['updateProfiles'],
     mutationFn: async ({ filePath, name, username }: TUploadIdentity) => {
       try {
         if (user.uid) {
@@ -81,16 +102,17 @@ const useUpload = () => {
     }: ArgumentClosedHandler) => {
       if (file) {
         try {
-          const usernameExist = await checkUsernameAvailability(username)
+          const usernameExist = await usernameAvailabe(username)
 
           if (!usernameExist)
             throw new Error('Name already used, try another username')
 
-          const fileName = file[0].name
-          const pathRef = `${user?.uid}/profiles/${fileName}`
+          const compressed = (await compressFile(file)) as File
+
+          const pathRef = `${user?.uid}/profiles/${compressed.name}`
           const folderRef = ref(storage, pathRef)
 
-          await uploadBytes(folderRef, file[0])
+          await uploadBytes(folderRef, compressed)
 
           await updateProfile.mutateAsync({
             name: name,
@@ -173,7 +195,7 @@ const useUpload = () => {
     updateProfile,
     uploadDefaultDocument,
     uploadContent,
-    checkUsernameAvailability,
+    usernameAvailabe,
   }
 }
 

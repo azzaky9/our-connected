@@ -16,7 +16,6 @@ import { fireStore as db } from '@/firebase/config'
 
 interface TContextValue {
   queryOption: UseQueryResult<ObjectFieldTypes[], unknown>
-  isUserinsideLikeField: boolean
 }
 
 const BlogsContext = createContext({} as TContextValue)
@@ -49,7 +48,6 @@ const getMainSource = async () => {
 }
 
 const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
-  const [isLikes, setIsLikes] = useState(false)
   // const { user } = useAuth()
 
   const blogsQuery = useQuery({
@@ -62,7 +60,6 @@ const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
     <BlogsContext.Provider
       value={{
         queryOption: blogsQuery,
-        isUserinsideLikeField: isLikes,
       }}
     >
       {children}

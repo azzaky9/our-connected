@@ -1,34 +1,36 @@
-"use client";
+'use client'
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { IoLogOutOutline } from "react-icons/io5";
-import { BiUser } from "react-icons/bi";
-import { Button } from "@/components/ui/button";
-import useFirebaseAuth from "@/hooks/useFirebaseAuth";
-import { SheetTrigger } from "../ui/sheet";
-import ProfileSettings from "@/components/Navbar/ProfileSettings";
-import Pict from "./Pict";
-import { Loader } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { IoLogOutOutline } from 'react-icons/io5'
+import { BiUser } from 'react-icons/bi'
+import { Button } from '@/components/ui/button'
+import useFirebaseAuth from '@/hooks/useFirebaseAuth'
+import { SheetTrigger } from '../ui/sheet'
+import ProfileSettings from '@/components/Navbar/ProfileSettings'
+import Pict from './Pict'
+import { Loader } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTrigger
-} from "../ui/dialog";
+  DialogTrigger,
+} from '../ui/dialog'
 
 const Profile = () => {
-  const { mutationSignOut } = useFirebaseAuth();
+  const { mutationSignOut } = useFirebaseAuth()
 
   return (
     <Dialog>
       <Popover>
-        <PopoverTrigger
-          className='hover:cursor-pointer'
-          asChild>
+        <PopoverTrigger className='hover:cursor-pointer' asChild>
           <div>
-            <Pict />
+            <Pict size='default' />
           </div>
         </PopoverTrigger>
         <PopoverContent className='w-[180px] p-0  text-slate-50 shadow-sm border-slate-800 bg-gray-900 '>
@@ -49,7 +51,7 @@ const Profile = () => {
           </div>
         </PopoverContent>
       </Popover>
-      <DialogContent className=' bg-slate-900 border-slate-600'>
+      <DialogContent className=' bg-slate-950 border-slate-600'>
         <DialogHeader>
           <DialogDescription className='text-white'>
             Are you sure absolutely sure for Log Out?
@@ -59,13 +61,18 @@ const Profile = () => {
           <Button
             disabled={mutationSignOut.isLoading}
             onClick={() => mutationSignOut.mutate()}
-            className=' bg-white text-black hover:bg-gray-200 '>
-            {mutationSignOut.isLoading ? <Loader className='animate-spin' /> : "Confirm Sign Out"}
+            className=' bg-white text-black hover:bg-gray-200 '
+          >
+            {mutationSignOut.isLoading ? (
+              <Loader className='animate-spin' />
+            ) : (
+              'Confirm Sign Out'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile

@@ -24,7 +24,7 @@ const Username: React.FC<TPropUsername> = ({ isPersonSuperUser, username }) => {
 
   return (
     <span className='flex gap-2 items-center '>
-      <span>{username}</span>
+      <span className='text-zinc-500'>{username}</span>
       {superUserMarking}
     </span>
   )
