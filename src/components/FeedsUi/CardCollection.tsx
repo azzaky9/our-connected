@@ -11,8 +11,6 @@ interface TCardCollection {
 }
 
 const CardCollection: React.FC<TCardCollection> = ({ source }) => {
-  const { likeDummyState } = useBlogs()
-
   return (
     <React.Fragment>
       {source.map((value) => (

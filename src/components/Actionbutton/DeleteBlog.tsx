@@ -20,7 +20,7 @@ import { LoaderIcon } from 'lucide-react'
 import { useBlogs } from '@/context/BlogsContext'
 
 const DeleteBlog = ({ blogId }: { blogId: string }) => {
-  const { queryOption, ownBlogQuery } = useBlogs()
+  const { feedsQ, userBlogsQ } = useBlogs()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const { mutate, isLoading } = useMutation({
@@ -30,8 +30,8 @@ const DeleteBlog = ({ blogId }: { blogId: string }) => {
         const documentRef = doc(fireStore, 'feeds', blogId)
         await deleteDoc(documentRef)
 
-        queryOption.refetch()
-        ownBlogQuery.refetch()
+        feedsQ.refetch()
+        userBlogsQ.refetch()
 
         setDialogOpen(false)
       } catch (error) {
