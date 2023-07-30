@@ -20,7 +20,7 @@ import { LoaderIcon } from 'lucide-react'
 import { useBlogs } from '@/context/BlogsContext'
 
 const DeleteBlog = ({ blogId }: { blogId: string }) => {
-  const { queryOption } = useBlogs()
+  const { queryOption, ownBlogQuery } = useBlogs()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const { mutate, isLoading } = useMutation({
@@ -31,6 +31,7 @@ const DeleteBlog = ({ blogId }: { blogId: string }) => {
         await deleteDoc(documentRef)
 
         queryOption.refetch()
+        ownBlogQuery.refetch()
 
         setDialogOpen(false)
       } catch (error) {

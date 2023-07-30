@@ -102,7 +102,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       })
     },
-    staleTime: Infinity,
   })
 
   return (

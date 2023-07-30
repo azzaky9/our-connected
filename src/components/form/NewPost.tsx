@@ -32,7 +32,7 @@ const NewPost = () => {
   const [inputValue, setInputValue] = useState('')
   const { generateToast } = useCustomToast()
   const { isLoading } = uploadContent
-  const { queryOption } = useBlogs()
+  const { queryOption, ownBlogQuery } = useBlogs()
   const maxWordCount = 1000
   const remainingWord = maxWordCount - inputValue.split(' ').length
   const router = useRouter()
@@ -53,6 +53,7 @@ const NewPost = () => {
         generateToast({ variant: 'success', message: 'successfully upload' })
         resetField('content')
         queryOption.refetch()
+        ownBlogQuery.refetch()
         resetField('title')
         router.push('/view/feeds')
       })

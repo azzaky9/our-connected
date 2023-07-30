@@ -23,6 +23,7 @@ import CopiedLink from './CopiedLink'
 import { ChevronUp } from 'lucide-react'
 import ExpandCtnt from './ExpandCtnt'
 import Username from './Username'
+import { useBlogs } from '@/context/BlogsContext'
 
 interface BlogCardPropTypes {
   withButton: boolean
@@ -90,7 +91,12 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
       <CardFooter>
         <div className='flex justify-between items-center w-full'>
           <div className='flex gap-5 items-center '>
-            <LoveButton blogId={id} uid={user.uid} likeBlog={likeBlog} />
+            <LoveButton
+              id={id}
+              uid={user.uid!}
+              likeBlog={likeBlog}
+              postedBy={postedBy}
+            />
 
             <span className='text-gray-500 pt-1 text-[0.828rem]'>
               Post Date {typeof createdAt === 'string' && createdAt}

@@ -1,37 +1,25 @@
 'use client'
 
-import React, { useState, useMemo, memo } from 'react'
+import React, { useState, useMemo, memo, useEffect } from 'react'
 
 import CardCollection from '@/components/FeedsUi/CardCollection'
 import DisplayEmptyPost from '@/components/DisplayEmptyPost'
 import SkeletonCard from '@/components/FeedsUi/SkeletonCard'
 import { useBlogs } from '@/context/BlogsContext'
+import { ObjectFieldTypes } from '@/types/type'
 
 const DisplayUserBlog = memo(({ userId }: { userId: string }) => {
-  const { queryOption } = useBlogs()
-  const [isLoading, setIsLoading] = useState(false)
+  const { userBlogsQ } = useBlogs()
+  const { isLoading, isRefetching, data, refetch } = userBlogsQ
 
-  const filterBlogs = useMemo(() => {
-    setIsLoading(true)
-
-    const result = queryOption.data?.filter((d) => d.postedBy === userId)
-
-    setIsLoading(false)
-
-    if (result) return result
-    else return null
-  }, [queryOption.data, userId])
-
-  const data = filterBlogs
-
-  if (isLoading || queryOption.isRefetching) return <SkeletonCard />
+  if (isLoading || isRefetching) return <SkeletonCard />
 
   return (
     <React.Fragment>
       {data ? (
         <div className='pt-20'>
           {data.length > 0 ? (
-            <CardCollection source={filterBlogs} />
+            <CardCollection source={data} />
           ) : (
             <DisplayEmptyPost />
           )}

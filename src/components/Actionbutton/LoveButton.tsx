@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Heart } from 'lucide-react'
 import {
   AlertDialog,
@@ -24,15 +24,16 @@ import {
 } from 'firebase/firestore'
 import { fireStore as db } from '@/firebase/config'
 import { ObjectFieldTypes } from '@/types/type'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useBlogs } from '@/context/BlogsContext'
 import { Button } from '../ui/button'
 
-type LikeField = Pick<ObjectFieldTypes, 'likeBlog'>
+type TUid = { uid: string }
+
+type LikeField = Pick<ObjectFieldTypes, 'likeBlog' | 'id' | 'postedBy'>
 
 interface TPropsLoveButton extends LikeField {
-  uid: string | null
-  blogId: string
+  uid: string
 }
 
 const NotifiedForLogin = () => {
@@ -69,39 +70,31 @@ const NotifiedForLogin = () => {
   )
 }
 
-const LoveButton: React.FC<TPropsLoveButton> = ({ likeBlog, uid, blogId }) => {
-  const { queryOption } = useBlogs()
-  const { refetch } = queryOption
-  const [likeCount, setLikeCount] = useState(likeBlog.length)
-  const [isExistInsideField, setExistInsideField] = useState(false)
+const LoveButton: React.FC<TPropsLoveButton> = (prop) => {
+  const { likeBlog, uid, id, postedBy } = prop
+
+  const { updateDummy, actWithDummy, likeDummyState } = useBlogs()
   const [isMountToServer, setIsMountToServer] = useState(false)
 
-  const docsRef = doc(db, 'feeds', blogId)
+  const docsRef = doc(db, 'feeds', id)
 
-  useEffect(() => {
-    const findUserExistInArray = () => {
-      const finding = likeBlog.find((person) => person === uid)
-
-      setExistInsideField(Boolean(finding))
-    }
-
-    findUserExistInArray()
-  }, [likeBlog, uid])
+  const getSpecState = likeDummyState.find((obj) => obj.id === id)
+  const isUserInsideField = Boolean(
+    getSpecState?.interestField.find((f) => f === uid)
+  )
 
   const handleLike = async () => {
     setIsMountToServer(true)
 
-    if (isExistInsideField) {
-      setIsMountToServer(true)
+    if (isUserInsideField) {
+      actWithDummy(id, uid, 'decrement')
 
-      setLikeCount(likeCount - 1)
-      setExistInsideField(false)
       await updateDoc(docsRef, {
         likeBlog: arrayRemove(uid),
       }).then(() => setIsMountToServer(false))
     } else {
-      setLikeCount(likeCount + 1)
-      setExistInsideField(true)
+      actWithDummy(id, uid, 'increment')
+
       await updateDoc(docsRef, {
         likeBlog: arrayUnion(uid),
       }).then(() => setIsMountToServer(false))
@@ -112,8 +105,6 @@ const LoveButton: React.FC<TPropsLoveButton> = ({ likeBlog, uid, blogId }) => {
     return (
       <span className='flex gap-2 items-center select-none'>
         <NotifiedForLogin />
-
-        {likeCount}
       </span>
     )
   }
@@ -128,14 +119,14 @@ const LoveButton: React.FC<TPropsLoveButton> = ({ likeBlog, uid, blogId }) => {
         }`}
       >
         <Heart
-          color={isExistInsideField ? 'rgb(225, 29, 72)' : '#3f3f46'}
+          color={isUserInsideField ? 'rgb(225, 29, 72)' : '#3f3f46'}
           onClick={handleLike}
           className={`text-xl ${
-            isExistInsideField ? 'fill-rose-600' : ''
+            isUserInsideField ? 'fill-rose-600' : ''
           }  transition-transform duration-1000 active:scale-90 `}
         />
       </Button>
-      {likeCount}
+      {getSpecState?.totalLike}
     </span>
   )
 }
