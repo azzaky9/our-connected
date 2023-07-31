@@ -17,6 +17,7 @@ import {
 import { useUpload, useCustomToast } from '@/hooks/index'
 import { CreateNewUserValues } from '@/components/form/CreateNewUser'
 import { doc, getDoc } from 'firebase/firestore'
+import { useBlogs } from '@/context/BlogsContext'
 
 interface DocumentTypesUsers {
   name: string
@@ -26,6 +27,7 @@ interface DocumentTypesUsers {
 
 const useFirebaseAuth = () => {
   const router = useRouter()
+  const { userBlogsQ } = useBlogs()
   const { clearUser, user, updateDispatchState } = useAuth()
   const { generateToast } = useCustomToast()
   const [errorAuthMessage, setErrorAuthMessage] = useState<string>('')
@@ -62,8 +64,9 @@ const useFirebaseAuth = () => {
         if (user) {
           setCredentialUser(user.email, user.uid)
 
+          router.push('/view/feeds')
+
           // navigateToHomePage(user);
-          return router.push('/view/feeds')
         }
 
         generateToast({ message: 'Redirecting', variant: 'info' })

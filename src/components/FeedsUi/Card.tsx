@@ -55,11 +55,15 @@ const Card: React.FC<BlogCardPropTypes> = ({ withButton, dataSource }) => {
   ) : null
 
   useEffect(() => {
-    const userRf = doc(fireStore, 'users', postedBy)
+    const getUserProfile = () => {
+      const userRf = doc(fireStore, 'users', postedBy)
 
-    getDoc(userRf).then((response) =>
-      setProfilePosted(response.data() as DocumentTypesUsers)
-    )
+      getDoc(userRf).then((response) =>
+        setProfilePosted(response.data() as DocumentTypesUsers)
+      )
+    }
+
+    getUserProfile()
   }, [postedBy])
 
   const expandComponentProps = {

@@ -6,6 +6,8 @@ import {
   useContext,
   useEffect,
   useState,
+  Dispatch,
+  SetStateAction,
 } from 'react'
 import { ObjectFieldTypes } from '@/types/type'
 import { useQuery, UseQueryResult } from 'react-query'
@@ -16,12 +18,10 @@ import {
   getDocs,
   QuerySnapshot,
   DocumentData,
-  onSnapshot,
   where,
 } from 'firebase/firestore'
 import { fireStore as db } from '@/firebase/config'
 import { useAuth } from './AuthContext'
-import { ValueOf } from 'next/dist/shared/lib/constants'
 
 type TAct = 'increment' | 'decrement'
 
@@ -29,6 +29,7 @@ interface TContextValue {
   likeDummyState: TLikeDummyStates[]
   feedsQ: UseQueryResult<ObjectFieldTypes[], unknown>
   userBlogsQ: UseQueryResult<ObjectFieldTypes[] | undefined, unknown>
+  setUidParams: Dispatch<SetStateAction<string>>
   updateDummy: (newDummy: TLikeDummyStates[]) => void
   actWithDummy: (id: string, uid: string, actionType?: TAct) => void
 }
@@ -54,17 +55,17 @@ const convertDates = (docSnapshot: QuerySnapshot<DocumentData>) => {
   return resultSource
 }
 
-export const getUserBlogs = async (idSearch: string | null) => {
-  if (idSearch) {
-    const q = query(collectionRef, where('postedBy', '==', idSearch))
-    const snapshot = await getDocs(q)
+// const getUserBlogs = async (idSearch: string | null) => {
+//   if (idSearch) {
+//     const q = query(collectionRef, where('postedBy', '==', idSearch))
+//     const snapshot = await getDocs(q)
 
-    const result = convertDates(snapshot)
+//     const result = convertDates(snapshot)
 
-    console.log(result, idSearch)
-    return result
-  }
-}
+//     console.log(result, idSearch)
+//     return result
+//   }
+// }
 
 export interface TLikeDummyStates {
   id: string
@@ -75,6 +76,7 @@ export interface TLikeDummyStates {
 const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
   const { user } = useAuth()
   const [likeDummyState, setLikeDummyState] = useState<TLikeDummyStates[]>([])
+  const [uidParams, setUidParams] = useState('')
 
   const createDefault = (data: ObjectFieldTypes[]) => {
     const defaultState: TLikeDummyStates[] = data?.map((feed) => {
@@ -101,6 +103,20 @@ const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
     return result
   }
 
+  const getUserBlogs = async (idSearch: string | null) => {
+
+    const q = query(
+      collectionRef,
+      where('postedBy', '==', idSearch )
+    )
+    const snapshot = await getDocs(q)
+
+    const result = convertDates(snapshot)
+
+    console.log(result, idSearch)
+    return result
+  }
+
   const feedsQ = useQuery({
     queryKey: ['feeds'],
     queryFn: getMainSource,
@@ -115,8 +131,6 @@ const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
 
   const updateDummy = (newDummy: TLikeDummyStates[]) => {
     setLikeDummyState([...newDummy])
-
-    console.log(likeDummyState)
   }
 
   const actWithDummy = (id: string, uid: string, actionType?: TAct) => {
@@ -144,6 +158,7 @@ const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
     userBlogsQ,
     updateDummy,
     actWithDummy,
+    setUidParams,
     likeDummyState,
   }
 
