@@ -24,8 +24,10 @@ const DisplayUserBlog: React.FC<TPropDisplayUserBlog> = memo(
     return (
       <React.Fragment>
         <div className='pt-20'>
-          {data ? (
-            <CardCollection source={data?.length === 0 ? initialData : data} />
+          {data && data.length > 0 ? (
+            <CardCollection source={data} />
+          ) : initialData && initialData.length > 0 ? (
+            <CardCollection source={initialData} />
           ) : (
             <DisplayEmptyPost />
           )}

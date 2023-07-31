@@ -88,7 +88,7 @@ const CropDialog: React.FC<TPropsCropDialog> = (prop) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         {!!src && (
-          <div className='max-h-[420px] overflow-scroll'>
+          <div className='max-h-[420px] overflow-y-scroll'>
             <ReactCrop
               crop={crop}
               onChange={(pixelCrop, percentCrop) => setCrop(pixelCrop)}
@@ -97,11 +97,14 @@ const CropDialog: React.FC<TPropsCropDialog> = (prop) => {
               locked
               circularCrop
             >
-              <img
+              <Image
                 ref={imgRef}
                 src={src}
                 alt='crop-preview'
                 onLoad={onImageLoad}
+                height={0}
+                width={0}
+                className='w-full h-auto'
               />
             </ReactCrop>
           </div>
