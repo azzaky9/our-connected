@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useForm, Resolver } from 'react-hook-form'
 import useFirebaseAuth from '@/hooks/useFirebaseAuth'
 import PasswordInputs from './PasswordInputs'
-import { BsGoogle } from 'react-icons/bs'
+import GoogleButton from '../Actionbutton/GoogleButton'
 import { Loader } from 'lucide-react'
 import { useBlogs } from '@/context/BlogsContext'
 
@@ -36,9 +36,8 @@ const resolver: Resolver<LoginValuesInput> = async (values) => {
 }
 
 const LoginForm = () => {
-  const { loginUser, signinWithGoogleAuth, errorAuthMessage, isAuthError } =
-    useFirebaseAuth()
-  const { isLoading, isError } = loginUser
+  const { loginUser, errorAuthMessage, isAuthError } = useFirebaseAuth()
+  const { isLoading } = loginUser
   const { userBlogsQ } = useBlogs()
 
   const {
@@ -106,16 +105,7 @@ const LoginForm = () => {
           </span>
         </div>
       </div>
-      <div className='grid'>
-        <Button
-          disabled={signinWithGoogleAuth.isLoading}
-          variant='outline'
-          onClick={() => signinWithGoogleAuth.mutate()}
-        >
-          <BsGoogle className='mr-2 h-4 w-4' />
-          Google
-        </Button>
-      </div>
+      <GoogleButton />
     </React.Fragment>
   )
 }

@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  SetStateAction,
-  useMemo,
-} from 'react'
+import { createContext, useContext, useState, SetStateAction } from 'react'
 import { auth, fireStore as db, storage } from '@/firebase/config'
 import { onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
@@ -92,6 +85,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const snapshot = await getDoc(docRef)
           const data = snapshot.data() as DocumentTypesUsers
 
+          console.log(data)
+
           await getProfile(data)
 
           updateDispatchState({
@@ -102,6 +97,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       })
     },
+    staleTime: Infinity,
   })
 
   return (

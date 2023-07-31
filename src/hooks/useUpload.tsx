@@ -31,11 +31,9 @@ interface ArgumentClosedHandler extends Omit<RegisteringAssetsType, 'file'> {
 }
 
 const useUpload = () => {
-  // const [crop, setCrop] = useState<Crop>({ , unit: "px" })
   const { user, updateDispatchState } = useAuth()
   const { generateToast } = useCustomToast()
   const { imageFileResizer } = FileResizer
-  const [fileCompress, setFileCompress] = useState<File | Blob | string>()
 
   const usernameAvailabe = async (username: string) => {
     try {

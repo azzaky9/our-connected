@@ -11,13 +11,10 @@ import {
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  sendEmailVerification,
   signInWithPopup,
 } from 'firebase/auth'
 import { useUpload, useCustomToast } from '@/hooks/index'
-import { CreateNewUserValues } from '@/components/form/CreateNewUser'
 import { doc, getDoc } from 'firebase/firestore'
-import { useBlogs } from '@/context/BlogsContext'
 
 interface DocumentTypesUsers {
   name: string
@@ -27,8 +24,7 @@ interface DocumentTypesUsers {
 
 const useFirebaseAuth = () => {
   const router = useRouter()
-  const { userBlogsQ } = useBlogs()
-  const { clearUser, user, updateDispatchState } = useAuth()
+  const { clearUser, updateDispatchState } = useAuth()
   const { generateToast } = useCustomToast()
   const [errorAuthMessage, setErrorAuthMessage] = useState<string>('')
   const [isAuthError, setIsAuthError] = useState(false)
@@ -97,12 +93,7 @@ const useFirebaseAuth = () => {
 
   const createNewUser = useMutation({
     mutationKey: ['createNewAcc'],
-    mutationFn: async ({
-      email,
-      password,
-      name,
-      username,
-    }: CreateNewUserValues) => {
+    mutationFn: async ({ email, password }: LoginValuesInput) => {
       try {
         const { user } = await createUserWithEmailAndPassword(
           auth,
@@ -110,24 +101,34 @@ const useFirebaseAuth = () => {
           password
         )
 
-        if (user) {
-          setCredentialUser(user.email, user.uid)
+        setCredentialUser(user.email, user.uid)
 
-          await sendEmailVerification(user)
+        const createRandomUser = `user${Math.floor(Math.random() * 999999)}`
 
-          uploadDefaultDocument
-            .mutateAsync({ name: name, username: username, filePath: '' })
-            .then(() =>
-              generateToast({
-                variant: 'success',
-                message: 'Successfully Created!',
-              })
-            )
-        }
+        uploadDefaultDocument.mutate({
+          name: 'unset-name',
+          username: createRandomUser,
+          filePath: '',
+        })
+
+        generateToast({
+          variant: 'success',
+          message: 'Successfully Created!',
+        })
+        router.push('/register/signin')
 
         throw FirebaseError
       } catch (error) {
-        if (error instanceof FirebaseError) console.error(error.message)
+        if (error instanceof FirebaseError) {
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              setErrorAuthMessage(
+                'email in your input already used, try different email'
+              )
+              break
+          }
+        }
+        setIsAuthError(true)
       }
     },
   })

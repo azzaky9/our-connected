@@ -1,12 +1,11 @@
-import SignupScreen from "./SignupScreen";
+import SignupScreen from './SignupScreen'
 
 const page = () => {
   return (
-    <main className='grid place-content-center gap-5 h-screen'>
-      <h1 className='text-center text-2xl font-semibold text-slate-50'>Create New Account</h1>
+    <main className='grid lg:grid-cols-5 place-content-center gap-5 h-screen'>
       <SignupScreen />
     </main>
-  );
-};
+  )
+}
 
-export default page;
+export default page

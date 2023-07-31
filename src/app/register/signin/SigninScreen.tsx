@@ -1,15 +1,15 @@
-import React from "react";
-import Link from "next/link";
-import LoginForm from "@/components/form/LoginForm";
-import AnimateType from "@/components/AnimateTyping";
+import React from 'react'
+import Link from 'next/link'
+import LoginForm from '@/components/form/LoginForm'
+import AnimateType from '@/components/AnimateTyping'
 import {
   Card,
   CardHeader,
   CardContent,
   CardDescription,
   CardFooter,
-  CardTitle
-} from "@/components/ui/card";
+  CardTitle,
+} from '@/components/ui/card'
 
 const SigninScreen = () => {
   return (
@@ -18,16 +18,16 @@ const SigninScreen = () => {
         <Card className='max-w-[380px] w-full max-[400px]:border-none'>
           <CardHeader className='space-y-1'>
             <CardTitle className='text-2xl'>Sign In</CardTitle>
-            <CardDescription>Enter your email below to access this app</CardDescription>
+            <CardDescription>
+              Enter your email below to access this app
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />
           </CardContent>
           <CardFooter>
-            <Link
-              href='./signup'
-              className=' text-zinc-600 text-sm'>
-              Not already have account? yo can sign up here{" "}
+            <Link href='./signup' className=' text-zinc-600 text-sm'>
+              Not already have account? you can sign up here{' '}
               <span className='text-blue-600'>here</span>
             </Link>
           </CardFooter>
@@ -38,7 +38,7 @@ const SigninScreen = () => {
         <AnimateType />
       </aside>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default SigninScreen;
+export default SigninScreen
