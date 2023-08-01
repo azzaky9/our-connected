@@ -1,6 +1,12 @@
 'use client'
 
-import { createContext, useContext, useState, SetStateAction } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  SetStateAction,
+  useEffect,
+} from 'react'
 import { auth, fireStore as db, storage } from '@/firebase/config'
 import { onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
@@ -29,7 +35,6 @@ export interface DocumentTypesUsers {
 
 interface TContextInitalValue {
   user: TUserAuth
-  isGettingUserData: boolean
   clearUser: () => void
   updateDispatchState: (newState: SetStateAction<TUserAuth>) => void
 }
@@ -51,17 +56,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isPersonSuperUser: false,
   })
 
-  const clear = () => {
-    setCurrentUser({
-      email: null,
-      profilePath: '',
-      uid: null,
-      name: null,
-      username: null,
-      isPersonSuperUser: false,
-    })
-  }
-
   const updateDispatchState = (newState: SetStateAction<TUserAuth>) => {
     setCurrentUser(newState)
   }
@@ -76,17 +70,21 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const { isLoading } = useQuery({
-    queryKey: ['session'],
-    queryFn: () => {
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          const docRef = doc(db, 'users', user.uid)
-          const snapshot = await getDoc(docRef)
-          const data = snapshot.data() as DocumentTypesUsers
+  useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const docRef = doc(db, 'users', user.uid)
+        const snapshot = await getDoc(docRef)
+        const data = snapshot.data() as DocumentTypesUsers
 
-          console.log(data)
+        const defaultStateContext = {
+          profilePath: '',
+          name: null,
+          username: null,
+          isPersonSuperUser: false,
+        }
 
+        if (snapshot.exists()) {
           await getProfile(data)
 
           updateDispatchState({
@@ -94,17 +92,32 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: user.email,
             uid: user.uid,
           })
+        } else {
+          updateDispatchState({
+            ...defaultStateContext,
+            email: user.email,
+            uid: user.uid,
+          })
         }
-      })
-    },
-    staleTime: Infinity,
-  })
+      }
+    })
+  }, [])
+
+  const clear = () => {
+    setCurrentUser({
+      email: null,
+      profilePath: '',
+      uid: null,
+      name: null,
+      username: null,
+      isPersonSuperUser: false,
+    })
+  }
 
   return (
     <AuthContext.Provider
       value={{
         user: currentUser,
-        isGettingUserData: isLoading,
         clearUser: clear,
         updateDispatchState,
       }}

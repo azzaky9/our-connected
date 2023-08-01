@@ -2,17 +2,14 @@
 
 import { NavigationMenu } from '@/components/Navbar/index'
 import { BiArrowBack } from 'react-icons/bi'
-import { Button } from './ui/button'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
-import { Skeleton } from './ui/skeleton'
 
 const Navbar = () => {
   const currentPath = usePathname()
-  const { push } = useRouter()
   const isRouteOnHomepage = currentPath === '/view/feeds'
-  const { user, isGettingUserData } = useAuth()
+  const { user } = useAuth()
 
   const renderForward = !isRouteOnHomepage ? (
     <Link href='/view/feeds'>
@@ -28,11 +25,7 @@ const Navbar = () => {
         } flex items-center`}
       >
         {renderForward}
-        {user.uid && !isGettingUserData ? (
-          <NavigationMenu />
-        ) : (
-          <Button>Login</Button>
-        )}
+        {user.uid ? <NavigationMenu /> : null}
       </div>
     </nav>
   )

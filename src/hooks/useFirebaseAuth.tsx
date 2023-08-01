@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth'
 import { useUpload, useCustomToast } from '@/hooks/index'
 import { doc, getDoc } from 'firebase/firestore'
+import { useBlogs } from '@/context/BlogsContext'
 
 interface DocumentTypesUsers {
   name: string
@@ -24,6 +25,8 @@ interface DocumentTypesUsers {
 
 const useFirebaseAuth = () => {
   const router = useRouter()
+
+  const { userBlogsQ } = useBlogs()
   const { clearUser, updateDispatchState } = useAuth()
   const { generateToast } = useCustomToast()
   const [errorAuthMessage, setErrorAuthMessage] = useState<string>('')
@@ -101,6 +104,8 @@ const useFirebaseAuth = () => {
           password
         )
 
+        console.log(user)
+
         setCredentialUser(user.email, user.uid)
 
         const createRandomUser = `user${Math.floor(Math.random() * 999999)}`
@@ -109,6 +114,7 @@ const useFirebaseAuth = () => {
           name: 'unset-name',
           username: createRandomUser,
           filePath: '',
+          uid: user.uid,
         })
 
         generateToast({
@@ -172,6 +178,7 @@ const useFirebaseAuth = () => {
       return signOut(auth)
         .then(() => {
           clearUser()
+          userBlogsQ.remove()
         })
         .catch((err) => {
           generateToast({ variant: 'error', message: err.message })

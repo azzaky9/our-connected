@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage'
 import { storage, fireStore } from '@/firebase/config'
@@ -28,6 +27,10 @@ interface ArgumentClosedHandler extends Omit<RegisteringAssetsType, 'file'> {
   closeEditModeHandler: () => void
   reset: UseFormReset<RegisteringAssetsType>
   file: File
+}
+
+interface TArgUploadDefault extends TUploadIdentity {
+  uid?: string
 }
 
 const useUpload = () => {
@@ -136,12 +139,15 @@ const useUpload = () => {
   })
 
   const uploadDefaultDocument = useMutation({
-    mutationFn: async ({ name, username, filePath }: TUploadIdentity) => {
+    mutationFn: async ({
+      name,
+      username,
+      filePath,
+      uid,
+    }: TArgUploadDefault) => {
       try {
-        if (user.uid) {
-          console.log('trigger')
-
-          const userDocRef = doc(fireStore, 'users', user.uid)
+        if (uid) {
+          const userDocRef = doc(fireStore, 'users', uid)
 
           await setDoc(userDocRef, {
             name: name,

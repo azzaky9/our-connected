@@ -2,9 +2,7 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
-  useEffect,
   useState,
   Dispatch,
   SetStateAction,
@@ -55,18 +53,6 @@ const convertDates = (docSnapshot: QuerySnapshot<DocumentData>) => {
   return resultSource
 }
 
-// const getUserBlogs = async (idSearch: string | null) => {
-//   if (idSearch) {
-//     const q = query(collectionRef, where('postedBy', '==', idSearch))
-//     const snapshot = await getDocs(q)
-
-//     const result = convertDates(snapshot)
-
-//     console.log(result, idSearch)
-//     return result
-//   }
-// }
-
 export interface TLikeDummyStates {
   id: string
   totalLike: number
@@ -104,16 +90,11 @@ const BlogsProvider: React.FC<TPropsBlogsProvider> = ({ children }) => {
   }
 
   const getUserBlogs = async (idSearch: string | null) => {
-
-    const q = query(
-      collectionRef,
-      where('postedBy', '==', idSearch )
-    )
+    const q = query(collectionRef, where('postedBy', '==', idSearch))
     const snapshot = await getDocs(q)
 
     const result = convertDates(snapshot)
 
-    console.log(result, idSearch)
     return result
   }
 
