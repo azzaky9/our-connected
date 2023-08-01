@@ -9,15 +9,15 @@ const withAuth = <P extends object>(Component: React.FC<P>) => {
   const ValidateAuthComponent: React.FC<P> = (props) => {
     const router = useRouter()
     const path = usePathname()
-    const { user, isGettingUserData } = useAuth()
+    const { user } = useAuth()
 
     useEffect(() => {
-      if (user.uid && !isGettingUserData && path === '/') {
+      if (user.uid && path === '/') {
         return router.push('/view/feeds')
       } else if (path !== '/register/signup' && !user.uid) {
         return router.push('/register/signin')
       }
-    }, [user, router, isGettingUserData, path])
+    }, [user, router, path])
 
     if (!user.uid) {
       return (
