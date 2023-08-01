@@ -7,7 +7,6 @@ import { type ObjectFieldTypes } from '@/types/type'
 import {
   Card as ParentCard,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -23,7 +22,6 @@ import CopiedLink from './CopiedLink'
 import { ChevronUp } from 'lucide-react'
 import ExpandCtnt from './ExpandCtnt'
 import Username from './Username'
-import { useBlogs } from '@/context/BlogsContext'
 
 interface BlogCardPropTypes {
   withButton: boolean
