@@ -159,10 +159,11 @@ const useFirebaseAuth = () => {
           } else {
             const createRandomUser = `user${Math.floor(Math.random() * 999999)}`
 
-            uploadDefaultDocument.mutate({
+            await uploadDefaultDocument.mutateAsync({
               name: user.displayName,
               username: createRandomUser,
               filePath: '',
+              uid: user.uid,
             })
 
             router.push('/view/feeds')
